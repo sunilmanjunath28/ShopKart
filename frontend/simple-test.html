@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Test</title>
+    <style>
+        body { font-family: Arial; padding: 40px; text-align: center; }
+        .big { font-size: 100px; font-weight: bold; color: #667eea; margin: 30px; }
+        button { background: #667eea; color: white; border: none; padding: 20px 40px; border-radius: 10px; font-size: 18px; cursor: pointer; margin: 10px; }
+        button:hover { background: #5568d3; }
+        .info { background: #f0f0f0; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 600px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Simple Product Test</h1>
+    <div class="big" id="count">0</div>
+    <p>Products in Storage</p>
+    
+    <button onclick="addProduct()">➕ Add Product</button>
+    <button onclick="checkCount()">🔄 Check Count</button>
+    <button onclick="clearAll()">🗑️ Clear All</button>
+    <button onclick="goToDashboard()">📊 Go to Dashboard</button>
+    
+    <div class="info" id="info"></div>
+
+    <script>
+        function addProduct() {
+            // Get or create user
+            let user = JSON.parse(localStorage.getItem('user') || 'null');
+            if (!user) {
+                user = { id: 1, name: 'Test Seller', email: 'test@test.com' };
+                localStorage.setItem('user', JSON.stringify(user));
+                console.log('Created user:', user);
+            }
+            
+            // Get products
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            
+            // Create new product
+            const newProduct = {
+                id: Date.now(),
+                name: 'Test Product ' + (products.length + 1),
+                description: 'This is a test product',
+                category: 'Electronics',
+                price: 999.99,
+                stock: 10,
+                sellerPhone: '+91 9876543210',
+                brand: 'TestBrand',
+                condition: 'New',
+                warranty: '1 Year',
+                imageUrl: 'https://via.placeholder.com/300',
+                images: ['https://via.placeholder.com/300'],
+                sellerId: user.id,
+                status: 'ACTIVE',
+                rating: 0,
+                reviews: 0,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Add to array
+            products.push(newProduct);
+            
+            // Save
+            localStorage.setItem('products', JSON.stringify(products));
+            
+            console.log('✅ Product added:', newProduct);
+            console.log('Total products now:', products.length);
+            
+            // Update display
+            checkCount();
+            
+            alert('✅ Product Added!\n\nProduct: ' + newProduct.name + '\nSeller ID: ' + newProduct.sellerId + '\nTotal Products: ' + products.length);
+        }
+        
+        function checkCount() {
+            const user = JSON.parse(localStorage.getItem('user') || '{"id":1}');
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const myProducts = products.filter(p => p.sellerId == user.id);
+            
+            document.getElementById('count').textContent = myProducts.length;
+            
+            let html = '<strong>Storage Info:</strong><br>';
+            html += 'User ID: ' + user.id + '<br>';
+            html += 'Total Products: ' + products.length + '<br>';
+            html += 'My Products: ' + myProducts.length + '<br><br>';
+            
+            if (myProducts.length > 0) {
+                html += '<strong>My Products:</strong><br>';
+                myProducts.forEach((p, i) => {
+                    html += (i+1) + '. ' + p.name + ' (ID: ' + p.id + ')<br>';
+                });
+            }
+            
+            document.getElementById('info').innerHTML = html;
+        }
+        
+        function clearAll() {
+            if (confirm('Clear all products?')) {
+                localStorage.removeItem('products');
+                checkCount();
+                alert('✅ Cleared!');
+            }
+        }
+        
+        function goToDashboard() {
+            window.location.href = 'seller-dashboard.html';
+        }
+        
+        // Check on load
+        window.onload = checkCount;
+    </script>
+</body>
+</html>

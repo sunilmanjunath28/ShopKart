@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Products - ShopKart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 { color: #667eea; }
+        h2 { color: #333; margin-top: 30px; }
+        .btn {
+            padding: 12px 24px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #e94560; color: white; }
+        .btn-warning { background: #ffa500; color: white; }
+        .info-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+        .product-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #28a745;
+        }
+        .error { border-left-color: #e94560; background: #ffe5e5; }
+        .success { border-left-color: #28a745; background: #e5ffe5; }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Product Debug Tool</h1>
+        <p>Use this page to debug and test the product system</p>
+        
+        <div class="stats" id="stats"></div>
+        
+        <div>
+            <button class="btn btn-success" onclick="addTestProduct()">➕ Add Test Product</button>
+            <button class="btn btn-primary" onclick="viewAllProducts()">👁️ View All Products</button>
+            <button class="btn btn-warning" onclick="viewCurrentUser()">👤 View Current User</button>
+            <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+        </div>
+        
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function updateStats() {
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userProducts = products.filter(p => p.sellerId === user.id);
+            
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${products.length}</div>
+                    <div class="stat-label">Total Products</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${userProducts.length}</div>
+                    <div class="stat-label">Your Products</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${user.id || 'N/A'}</div>
+                    <div class="stat-label">Your User ID</div>
+                </div>
+            `;
+        }
+
+        function addTestProduct() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!user.id) {
+                showOutput('error', 'No user logged in! Please login first.');
+                return;
+            }
+            
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            
+            const testProduct = {
+                id: Date.now(),
+                name: `Test Product ${products.length + 1}`,
+                price: Math.floor(Math.random() * 1000) + 100,
+                category: 'Electronics, Gadgets',
+                stock: Math.floor(Math.random() * 50) + 10,
+                description: 'This is a test product created for debugging purposes',
+                brand: 'TestBrand',
+                condition: 'New',
+                warranty: '1 Year',
+                imageUrl: 'https://via.placeholder.com/300',
+                images: ['https://via.placeholder.com/300'],
+                sellerId: user.id,
+                status: 'ACTIVE',
+                createdAt: new Date().toISOString()
+            };
+            
+            products.push(testProduct);
+            localStorage.setItem('products', JSON.stringify(products));
+            
+            showOutput('success', `✅ Test product added successfully!<br>
+                Product ID: ${testProduct.id}<br>
+                Seller ID: ${testProduct.sellerId}<br>
+                Name: ${testProduct.name}<br>
+                Price: ₹${testProduct.price}`);
+            
+            updateStats();
+        }
+
+        function viewAllProducts() {
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (products.length === 0) {
+                showOutput('info', 'No products found in localStorage');
+                return;
+            }
+            
+            let html = '<h2>All Products in localStorage</h2>';
+            
+            products.forEach((p, index) => {
+                const isYours = p.sellerId === user.id;
+                html += `
+                    <div class="product-item ${isYours ? 'success' : ''}">
+                        <strong>#${index + 1} - ${p.name}</strong> ${isYours ? '(YOUR PRODUCT)' : ''}<br>
+                        🆔 Product ID: ${p.id}<br>
+                        👤 Seller ID: ${p.sellerId}<br>
+                        💰 Price: ₹${p.price}<br>
+                        📁 Category: ${p.category}<br>
+                        📦 Stock: ${p.stock}<br>
+                        📅 Created: ${new Date(p.createdAt).toLocaleString()}<br>
+                        <button class="btn btn-danger" style="margin-top: 10px;" onclick="deleteProduct(${p.id})">Delete</button>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('output').innerHTML = html;
+        }
+
+        function viewCurrentUser() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = localStorage.getItem('token');
+            
+            if (!user.id) {
+                showOutput('error', 'No user logged in!<br>Please go to login page and login first.');
+                return;
+            }
+            
+            showOutput('info', `
+                <h2>Current User Information</h2>
+                <strong>User ID:</strong> ${user.id}<br>
+                <strong>Name:</strong> ${user.name || 'N/A'}<br>
+                <strong>Email:</strong> ${user.email || 'N/A'}<br>
+                <strong>Token:</strong> ${token ? 'Present' : 'Missing'}<br>
+                <br>
+                <strong>Full User Object:</strong>
+                <pre>${JSON.stringify(user, null, 2)}</pre>
+            `);
+        }
+
+        function deleteProduct(productId) {
+            if (confirm('Delete this product?')) {
+                const products = JSON.parse(localStorage.getItem('products') || '[]');
+                const updated = products.filter(p => p.id !== productId);
+                localStorage.setItem('products', JSON.stringify(updated));
+                showOutput('success', '✅ Product deleted!');
+                updateStats();
+                viewAllProducts();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ This will clear ALL products and user data. Are you sure?')) {
+                localStorage.removeItem('products');
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                showOutput('success', '✅ All data cleared!');
+                updateStats();
+            }
+        }
+
+        function showOutput(type, message) {
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info-box';
+            document.getElementById('output').innerHTML = `
+                <div class="${className}" style="margin-top: 20px;">
+                    ${message}
+                </div>
+            `;
+        }
+
+        // Auto-update stats on load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateStats();
+            showOutput('info', '👋 Debug tool loaded. Click buttons above to test the system.');
+        });
+    </script>
+</body>
+</html>

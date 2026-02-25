@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Profile Flow</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2874f0;
+            margin-top: 0;
+        }
+        button {
+            background: #fb641b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #e55a12;
+        }
+        .info {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .data {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🧪 Profile Flow Test Tool</h2>
+        <p>Use this tool to test the profile persistence flow</p>
+    </div>
+
+    <div class="card">
+        <h2>📊 Current localStorage Data</h2>
+        <button onclick="showData()">Refresh Data</button>
+        <button onclick="clearAll()">Clear All Data</button>
+        <div id="dataDisplay" class="data">Click "Refresh Data" to see localStorage contents</div>
+    </div>
+
+    <div class="card">
+        <h2>🧪 Test Scenarios</h2>
+        
+        <div class="info">
+            <strong>Scenario 1: New User Registration</strong>
+            <ol>
+                <li>Register with email: test@example.com</li>
+                <li>Fill profile details (phone, city, pincode)</li>
+                <li>Check localStorage - should see profile_test@example.com</li>
+            </ol>
+            <button onclick="simulateNewUser()">Simulate New User</button>
+        </div>
+
+        <div class="info">
+            <strong>Scenario 2: Logout & Login Again</strong>
+            <ol>
+                <li>Logout (removes loggedInUser, token, user)</li>
+                <li>Login with same email</li>
+                <li>Should redirect to dashboard (not profile page)</li>
+            </ol>
+            <button onclick="simulateLogout()">Simulate Logout</button>
+            <button onclick="simulateLogin()">Simulate Login</button>
+        </div>
+
+        <div class="info">
+            <strong>Scenario 3: Different User</strong>
+            <ol>
+                <li>Login with different email: user2@example.com</li>
+                <li>Should redirect to profile page (no saved profile)</li>
+            </ol>
+            <button onclick="simulateDifferentUser()">Simulate Different User</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>✅ Expected Behavior</h2>
+        <ul>
+            <li>✅ Profile saved as: <code>profile_&lt;email&gt;</code></li>
+            <li>✅ Logout removes: loggedInUser, token, user</li>
+            <li>✅ Logout keeps: profile_&lt;email&gt;</li>
+            <li>✅ Login with saved profile → dashboard-select.html</li>
+            <li>✅ Login without saved profile → profile.html</li>
+        </ul>
+    </div>
+
+    <script>
+        function showData() {
+            const data = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                try {
+                    data[key] = JSON.parse(value);
+                } catch {
+                    data[key] = value;
+                }
+            }
+            document.getElementById('dataDisplay').textContent = JSON.stringify(data, null, 2);
+        }
+
+        function clearAll() {
+            if (confirm('Clear all localStorage data?')) {
+                localStorage.clear();
+                showData();
+                alert('✅ All data cleared!');
+            }
+        }
+
+        function simulateNewUser() {
+            const email = 'test@example.com';
+            
+            // Simulate registration
+            localStorage.setItem('loggedInUser', email);
+            localStorage.setItem('token', 'demo-token-123');
+            localStorage.setItem('user', JSON.stringify({
+                email: email,
+                name: 'Test User',
+                id: 1
+            }));
+
+            // Simulate profile save
+            const profileKey = 'profile_' + email;
+            localStorage.setItem(profileKey, JSON.stringify({
+                name: 'Test User',
+                phone: '1234567890',
+                city: 'Mumbai',
+                pincode: '400001',
+                profileImage: ''
+            }));
+
+            showData();
+            alert('✅ Simulated new user with complete profile!');
+        }
+
+        function simulateLogout() {
+            // Save profile before logout
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                if (user.email) {
+                    const profileKey = 'profile_' + user.email;
+                    // Profile should already exist, but ensure it's saved
+                    console.log('Profile preserved at:', profileKey);
+                }
+            }
+
+            // Remove only session data
+            localStorage.removeItem('loggedInUser');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+
+            showData();
+            alert('✅ Logged out! Notice: profile_* data is still there');
+        }
+
+        function simulateLogin() {
+            const email = 'test@example.com';
+            const profileKey = 'profile_' + email;
+            const savedProfile = localStorage.getItem(profileKey);
+
+            if (savedProfile) {
+                // Profile exists - restore session
+                localStorage.setItem('loggedInUser', email);
+                localStorage.setItem('token', 'demo-token-123');
+                
+                const profile = JSON.parse(savedProfile);
+                localStorage.setItem('user', JSON.stringify({
+                    email: email,
+                    name: profile.name,
+                    phone: profile.phone,
+                    city: profile.city,
+                    pincode: profile.pincode,
+                    profileImage: profile.profileImage,
+                    id: 1
+                }));
+
+                showData();
+                alert('✅ Login successful! Profile loaded from localStorage.\n\nShould redirect to: dashboard-select.html');
+            } else {
+                alert('❌ No saved profile found!\n\nShould redirect to: profile.html');
+            }
+        }
+
+        function simulateDifferentUser() {
+            const email = 'user2@example.com';
+            const profileKey = 'profile_' + email;
+            const savedProfile = localStorage.getItem(profileKey);
+
+            localStorage.setItem('loggedInUser', email);
+            localStorage.setItem('token', 'demo-token-456');
+            localStorage.setItem('user', JSON.stringify({
+                email: email,
+                name: 'User Two',
+                id: 2
+            }));
+
+            showData();
+            
+            if (savedProfile) {
+                alert('✅ Profile exists for user2@example.com\n\nShould redirect to: dashboard-select.html');
+            } else {
+                alert('⚠️ No profile for user2@example.com\n\nShould redirect to: profile.html');
+            }
+        }
+
+        // Auto-load data on page load
+        window.onload = showData;
+    </script>
+</body>
+</html>

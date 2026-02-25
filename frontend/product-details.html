@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - ShopKart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .navbar a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 20px;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+
+        .navbar a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .product-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .image-section {
+            position: relative;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .image-gallery {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            overflow-x: auto;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .thumbnail:hover, .thumbnail.active {
+            border-color: #667eea;
+        }
+
+        .info-section h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .price {
+            font-size: 36px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .description {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .seller-card {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border: 2px solid #ffc107;
+        }
+
+        .seller-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ffc107;
+        }
+
+        .seller-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #667eea;
+        }
+
+        .seller-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .seller-badge {
+            font-size: 12px;
+            color: #666;
+            background: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+        }
+
+        .seller-info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .seller-info-item .icon {
+            font-size: 24px;
+            width: 40px;
+            text-align: center;
+        }
+
+        .seller-info-item .label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .seller-info-item .value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .product-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .product-details h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .btn-buy {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .product-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <h1>🛒 ShopKart</h1>
+    <a href="buy-dashboard.html">← Back to Shop</a>
+</div>
+
+<div class="container">
+    <div class="product-section">
+        <!-- Left: Product Images -->
+        <div class="image-section">
+            <img id="mainImage" class="main-image" src="" alt="Product">
+            <div id="imageGallery" class="image-gallery"></div>
+        </div>
+
+        <!-- Right: Product Info -->
+        <div class="info-section">
+            <span id="categoryBadge" class="category-badge"></span>
+            <h1 id="productName"></h1>
+            <div id="productPrice" class="price"></div>
+            <div id="productDescription" class="description"></div>
+
+            <!-- Seller Information Card -->
+            <div class="seller-card">
+                <div class="seller-header">
+                    <img id="sellerAvatar" class="seller-avatar" src="" alt="Seller">
+                    <div>
+                        <div class="seller-name" id="sellerName"></div>
+                        <div class="seller-badge">✓ Verified Seller</div>
+                    </div>
+                </div>
+
+                <div id="sellerContactInfo"></div>
+            </div>
+
+            <!-- Product Details -->
+            <div class="product-details">
+                <h3>📦 Product Details</h3>
+                <div id="productDetailsContent"></div>
+            </div>
+
+            <button class="btn-buy" onclick="buyProduct()">🛒 Buy Now</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const API_URL = 'http://localhost:8080/api';
+let currentProduct = null;
+let currentUser = null;
+
+window.addEventListener('DOMContentLoaded', async () => {
+    // Get current user
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+        currentUser = JSON.parse(userStr);
+    }
+
+    // Get product ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    
+    if (!productId) {
+        alert('Product not found');
+        window.location.href = 'buy-dashboard.html';
+        return;
+    }
+
+    await loadProduct(productId);
+});
+
+async function loadProduct(productId) {
+    try {
+        // Load product from localStorage
+        const products = JSON.parse(localStorage.getItem('products') || '[]');
+        const product = products.find(p => p.id == productId);
+        
+        if (!product) {
+            alert('Product not found');
+            window.location.href = 'buy-dashboard.html';
+            return;
+        }
+
+        currentProduct = product;
+        console.log('📦 Product loaded:', product);
+
+        // Load seller profile
+        await loadSellerProfile(product.sellerId, product.sellerEmail);
+
+        // Display product
+        displayProduct();
+    } catch (error) {
+        console.error('Error loading product:', error);
+        alert('Error loading product');
+    }
+}
+
+async function loadSellerProfile(sellerId, sellerEmail) {
+    console.log('👤 Loading seller profile...');
+    
+    // Try to get seller profile from email-based storage
+    if (sellerEmail) {
+        const profileKey = 'profile_' + sellerEmail;
+        const savedProfile = localStorage.getItem(profileKey);
+        if (savedProfile) {
+            const profile = JSON.parse(savedProfile);
+            currentProduct.sellerProfile = profile;
+            console.log('✅ Seller profile loaded:', profile);
+            return;
+        }
+    }
+    
+    // Try to get from current user if it's the same seller
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+        const user = JSON.parse(userStr);
+        if (user.id == sellerId) {
+            currentProduct.sellerProfile = user;
+            console.log('✅ Seller profile loaded from current user');
+            return;
+        }
+    }
+    
+    console.log('⚠️ Using product seller info');
+}
+
+function displayProduct() {
+    const p = currentProduct;
+    const profile = p.sellerProfile || {};
+    
+    // Product images
+    const images = p.images || [p.image || p.imageUrl];
+    const mainImg = images[0] || 'https://via.placeholder.com/400?text=No+Image';
+    
+    document.getElementById('mainImage').src = mainImg;
+    
+    if (images.length > 1) {
+        document.getElementById('imageGallery').innerHTML = images.map((img, i) => 
+            `<img src="${img}" class="thumbnail ${i === 0 ? 'active' : ''}" onclick="changeImage('${img}', this)">`
+        ).join('');
+    }
+    
+    // Product info
+    document.getElementById('categoryBadge').textContent = p.category || 'General';
+    document.getElementById('productName').textContent = p.name;
+    document.getElementById('productPrice').textContent = '₹' + p.price.toFixed(2);
+    document.getElementById('productDescription').textContent = p.description || 'No description';
+    
+    // Seller info
+    const sellerName = profile.name || p.seller || 'Seller';
+    const sellerPhone = profile.phone || p.sellerPhone;
+    const sellerEmail = profile.email || p.sellerEmail;
+    const sellerCity = profile.city || p.sellerCity;
+    const sellerPincode = profile.pincode || p.sellerPincode;
+    const sellerImage = profile.profileImage || p.sellerProfileImage;
+    
+    // Seller avatar
+    if (sellerImage) {
+        document.getElementById('sellerAvatar').src = sellerImage;
+    } else {
+        document.getElementById('sellerAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&size=80&background=667eea&color=fff`;
+    }
+    
+    document.getElementById('sellerName').textContent = sellerName;
+    
+    // Seller contact info
+    let contactHTML = '';
+    
+    if (sellerPhone) {
+        contactHTML += `
+            <div class="seller-info-item">
+                <div class="icon">📱</div>
+                <div>
+                    <div class="label">Phone Number</div>
+                    <div class="value">${sellerPhone}</div>
+                </div>
+            </div>`;
+    }
+    
+    if (sellerEmail) {
+        contactHTML += `
+            <div class="seller-info-item">
+                <div class="icon">📧</div>
+                <div>
+                    <div class="label">Email Address</div>
+                    <div class="value">${sellerEmail}</div>
+                </div>
+            </div>`;
+    }
+    
+    if (sellerCity || sellerPincode) {
+        const location = sellerCity && sellerPincode ? `${sellerCity} - ${sellerPincode}` : (sellerCity || sellerPincode);
+        contactHTML += `
+            <div class="seller-info-item">
+                <div class="icon">📍</div>
+                <div>
+                    <div class="label">Location</div>
+                    <div class="value">${location}</div>
+                </div>
+            </div>`;
+    }
+    
+    document.getElementById('sellerContactInfo').innerHTML = contactHTML;
+    
+    // Product details
+    let detailsHTML = '';
+    
+    if (p.brand) {
+        detailsHTML += `<div class="detail-row"><span>🏷️ Brand</span><strong>${p.brand}</strong></div>`;
+    }
+    
+    if (p.condition) {
+        detailsHTML += `<div class="detail-row"><span>📦 Condition</span><strong>${p.condition}</strong></div>`;
+    }
+    
+    if (p.warranty) {
+        detailsHTML += `<div class="detail-row"><span>🛡️ Warranty</span><strong>${p.warranty}</strong></div>`;
+    }
+    
+    if (p.stock !== undefined) {
+        const stockColor = p.stock > 10 ? '#28a745' : p.stock > 0 ? '#ffc107' : '#dc3545';
+        detailsHTML += `<div class="detail-row"><span>📊 Stock</span><strong style="color: ${stockColor}">${p.stock} units</strong></div>`;
+    }
+    
+    document.getElementById('productDetailsContent').innerHTML = detailsHTML;
+    
+    console.log('✅ Product displayed with seller info');
+}
+
+function changeImage(src, thumb) {
+    document.getElementById('mainImage').src = src;
+    document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+}
+
+async function buyProduct() {
+    if (!currentUser) {
+        alert('Please login to purchase');
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    const address = prompt('Enter your shipping address:');
+    if (!address || !address.trim()) {
+        alert('Shipping address is required!');
+        return;
+    }
+    
+    const order = {
+        id: Date.now(),
+        buyerId: currentUser.id,
+        buyerName: currentUser.name,
+        buyerPhone: currentUser.phone,
+        buyerEmail: currentUser.email,
+        sellerId: currentProduct.sellerId,
+        productId: currentProduct.id,
+        productName: currentProduct.name,
+        productDescription: currentProduct.description,
+        productImage: currentProduct.image || currentProduct.imageUrl,
+        quantity: 1,
+        totalPrice: currentProduct.price,
+        status: 'PENDING',
+        shippingAddress: address.trim(),
+        sellerPhone: currentProduct.sellerPhone,
+        createdAt: new Date().toISOString()
+    };
+    
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+    
+    alert(`🎉 Order Placed Successfully!\n\nProduct: ${currentProduct.name}\nPrice: ₹${currentProduct.price.toFixed(2)}\nShipping to: ${address}\n\nThe seller will contact you soon!`);
+    
+    if (confirm('View your order details?')) {
+        // Redirect to order details page for this specific order
+        window.location.href = `order-details.html?id=${order.id}`;
+    } else {
+        // Redirect to all orders page
+        window.location.href = 'orders.html';
+    }
+}
+</script>
+
+</body>
+</html>

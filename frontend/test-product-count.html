@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Product Count</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 { color: #333; }
+        h2 { color: #667eea; margin-top: 20px; }
+        .info { 
+            background: #e3f2fd; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 10px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .success { 
+            background: #e8f5e9; 
+            border-left-color: #4caf50;
+        }
+        .error { 
+            background: #ffebee; 
+            border-left-color: #f44336;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .stat {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-box">
+        <h1>🧪 Product Count Test</h1>
+        <p>This page helps diagnose why products aren't showing in the dashboard.</p>
+        
+        <div class="stat" id="productCount">0</div>
+        <p style="text-align: center; color: #666;">Products for current user</p>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="runTest()">🔍 Run Full Test</button>
+            <button onclick="clearStorage()">🗑️ Clear All Data</button>
+            <button onclick="addTestProduct()">➕ Add Test Product</button>
+            <button onclick="location.href='seller-dashboard.html'">📊 Go to Dashboard</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Get or create user
+            const userStr = localStorage.getItem('user');
+            if (!userStr) {
+                currentUser = { id: 1, name: 'Test Seller', email: 'seller@test.com' };
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                console.log('Created test user:', currentUser);
+            } else {
+                currentUser = JSON.parse(userStr);
+                console.log('Loaded user:', currentUser);
+            }
+            
+            runTest();
+        });
+
+        function runTest() {
+            const results = document.getElementById('results');
+            let html = '<h2>Test Results</h2>';
+            
+            try {
+                // Test 1: Check user
+                html += '<div class="info">';
+                html += '<strong>✅ Test 1: User Check</strong><br>';
+                html += `User ID: ${currentUser.id} (type: ${typeof currentUser.id})<br>`;
+                html += `User Name: ${currentUser.name}<br>`;
+                html += `User Email: ${currentUser.email}`;
+                html += '</div>';
+                
+                // Test 2: Check localStorage
+                const products = JSON.parse(localStorage.getItem('products') || '[]');
+                html += '<div class="info">';
+                html += '<strong>📦 Test 2: localStorage Check</strong><br>';
+                html += `Total products in storage: ${products.length}<br>`;
+                
+                if (products.length > 0) {
+                    html += '<br><strong>All Products:</strong><br>';
+                    products.forEach((p, i) => {
+                        html += `${i+1}. "${p.name}" - Seller ID: ${p.sellerId} (type: ${typeof p.sellerId})<br>`;
+                    });
+                }
+                html += '</div>';
+                
+                // Test 3: Filter by seller
+                const myProducts = products.filter(p => p.sellerId == currentUser.id);
+                const productCount = myProducts.length;
+                
+                document.getElementById('productCount').textContent = productCount;
+                
+                if (productCount > 0) {
+                    html += '<div class="info success">';
+                    html += `<strong>✅ Test 3: Filter Results - FOUND ${productCount} PRODUCTS!</strong><br>`;
+                    myProducts.forEach((p, i) => {
+                        html += `${i+1}. "${p.name}" - ₹${p.price} - Stock: ${p.stock}<br>`;
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<div class="info error">';
+                    html += '<strong>❌ Test 3: Filter Results - NO PRODUCTS FOUND</strong><br>';
+                    html += `Looking for products with sellerId == ${currentUser.id}<br>`;
+                    
+                    if (products.length > 0) {
+                        html += '<br><strong>Mismatch Details:</strong><br>';
+                        products.forEach((p, i) => {
+                            const match = p.sellerId == currentUser.id;
+                            html += `${i+1}. Product sellerId: ${p.sellerId} vs User ID: ${currentUser.id} = ${match ? 'MATCH ✅' : 'NO MATCH ❌'}<br>`;
+                        });
+                    } else {
+                        html += '<br>No products in storage at all. Try adding a product first.';
+                    }
+                    html += '</div>';
+                }
+                
+                // Test 4: Storage space
+                html += '<div class="info">';
+                html += '<strong>💾 Test 4: Storage Info</strong><br>';
+                const storageStr = JSON.stringify(products);
+                const storageSize = new Blob([storageStr]).size;
+                html += `Storage used: ${(storageSize / 1024).toFixed(2)} KB<br>`;
+                html += `localStorage limit: ~5-10 MB`;
+                html += '</div>';
+                
+            } catch (error) {
+                html += `<div class="info error"><strong>❌ Error:</strong> ${error.message}</div>`;
+            }
+            
+            results.innerHTML = html;
+        }
+
+        function clearStorage() {
+            if (confirm('⚠️ This will delete ALL products and user data. Continue?')) {
+                localStorage.removeItem('products');
+                localStorage.removeItem('user');
+                
+                // Also clear IndexedDB
+                indexedDB.deleteDatabase('ShopKartDB');
+                
+                alert('✅ All data cleared! Reloading page...');
+                location.reload();
+            }
+        }
+
+        function addTestProduct() {
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            
+            const testProduct = {
+                id: Date.now(),
+                name: `Test Product ${products.length + 1}`,
+                description: 'This is a test product',
+                category: 'Electronics',
+                price: 999.99,
+                stock: 10,
+                sellerPhone: '+91 9876543210',
+                brand: 'TestBrand',
+                condition: 'New',
+                warranty: '1 Year',
+                imageUrl: 'https://via.placeholder.com/300',
+                images: ['https://via.placeholder.com/300'],
+                sellerId: currentUser.id,
+                status: 'ACTIVE',
+                rating: 0,
+                reviews: 0,
+                createdAt: new Date().toISOString()
+            };
+            
+            products.push(testProduct);
+            localStorage.setItem('products', JSON.stringify(products));
+            
+            console.log('✅ Test product added:', testProduct);
+            alert(`✅ Test product added!\n\nProduct ID: ${testProduct.id}\nSeller ID: ${testProduct.sellerId}`);
+            
+            runTest();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Item - ShopKart</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 { color: #333; margin-bottom: 30px; text-align: center; }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea { min-height: 100px; resize: vertical; }
+        .required { color: #e94560; }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .category-option {
+            padding: 15px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .category-option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        .category-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        .category-icon { font-size: 24px; margin-bottom: 5px; }
+        .image-upload {
+            border: 3px dashed #667eea;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+        }
+        .image-upload:hover { background: #f0f4ff; }
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .preview-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+        }
+        .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+        .counter {
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>➕ Add New Item</h1>
+        
+        <div id="alertContainer"></div>
+        
+        <form id="productForm">
+            <!-- Item Name -->
+            <div class="form-group">
+                <label>Item Name <span class="required">*</span></label>
+                <input type="text" id="productName" placeholder="e.g., iPhone 15 Pro" required>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label>Description <span class="required">*</span></label>
+                <textarea id="productDescription" placeholder="Describe your product..." required></textarea>
+            </div>
+
+            <!-- Categories -->
+            <div class="form-group">
+                <label>Categories (Select 1-2) <span class="required">*</span></label>
+                <div class="counter" id="categoryCounter">0/2 selected</div>
+                <div class="category-grid" id="categoryGrid"></div>
+                <input type="hidden" id="productCategory" required>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="form-group">
+                <label>Product Images <span class="required">*</span></label>
+                <div class="image-upload" onclick="document.getElementById('imageInput').click()">
+                    <div style="font-size: 40px;">📸</div>
+                    <p>Click to upload images</p>
+                    <p style="font-size: 12px; color: #999;">Max 5 images, 5MB each</p>
+                </div>
+                <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
+                <div class="image-preview" id="imagePreview"></div>
+            </div>
+
+            <!-- Price -->
+            <div class="form-group">
+                <label>Price (₹) <span class="required">*</span></label>
+                <input type="number" id="productPrice" placeholder="0.00" min="0" step="0.01" required>
+            </div>
+
+            <!-- Stock -->
+            <div class="form-group">
+                <label>Stock Quantity <span class="required">*</span></label>
+                <input type="number" id="productStock" placeholder="0" min="1" required>
+            </div>
+
+            <!-- Brand -->
+            <div class="form-group">
+                <label>Brand</label>
+                <input type="text" id="productBrand" placeholder="e.g., Apple">
+            </div>
+
+            <!-- Condition -->
+            <div class="form-group">
+                <label>Condition</label>
+                <select id="productCondition">
+                    <option value="New">New</option>
+                    <option value="Like New">Like New</option>
+                    <option value="Good">Good</option>
+                    <option value="Fair">Fair</option>
+                </select>
+            </div>
+
+            <!-- Warranty -->
+            <div class="form-group">
+                <label>Warranty</label>
+                <input type="text" id="productWarranty" placeholder="e.g., 1 Year">
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='seller-dashboard.html'">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="publishBtn">
+                    <span id="publishBtnText">📤 Publish Item</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let selectedCategories = [];
+        let uploadedImages = [];
+        let currentUser = null;
+
+        // Categories
+        const categories = [
+            { name: 'Groceries', icon: '🛒' },
+            { name: 'Electronics', icon: '📱' },
+            { name: 'Fashion', icon: '👗' },
+            { name: 'Gadgets', icon: '⌚' },
+            { name: 'Home Appliances', icon: '🏠' },
+            { name: 'Kitchen Items', icon: '🍳' },
+            { name: 'Toys', icon: '🧸' },
+            { name: 'Books', icon: '📚' },
+            { name: 'Sports', icon: '⚽' },
+            { name: 'Beauty', icon: '💄' }
+        ];
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('=== ADD ITEM PAGE LOADED ===');
+            
+            // Get or create user
+            const userStr = localStorage.getItem('user');
+            if (!userStr) {
+                currentUser = { id: 1, name: 'Test Seller', email: 'seller@test.com' };
+                localStorage.setItem('user', JSON.stringify(currentUser));
+            } else {
+                currentUser = JSON.parse(userStr);
+            }
+            
+            console.log('Current user:', currentUser);
+            
+            loadCategories();
+            setupImageUpload();
+            setupFormSubmit();
+        });
+
+        // Load categories
+        function loadCategories() {
+            const grid = document.getElementById('categoryGrid');
+            grid.innerHTML = categories.map(cat => `
+                <div class="category-option" data-category="${cat.name}">
+                    <div class="category-icon">${cat.icon}</div>
+                    <div>${cat.name}</div>
+                </div>
+            `).join('');
+
+            // Add click handlers
+            document.querySelectorAll('.category-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const category = option.dataset.category;
+                    
+                    if (option.classList.contains('selected')) {
+                        // Deselect
+                        option.classList.remove('selected');
+                        selectedCategories = selectedCategories.filter(c => c !== category);
+                    } else if (selectedCategories.length < 2) {
+                        // Select
+                        option.classList.add('selected');
+                        selectedCategories.push(category);
+                    } else {
+                        showAlert('Maximum 2 categories allowed', 'error');
+                    }
+                    
+                    // Update hidden input and counter
+                    document.getElementById('productCategory').value = selectedCategories.join(', ');
+                    document.getElementById('categoryCounter').textContent = `${selectedCategories.length}/2 selected`;
+                });
+            });
+        }
+
+        // Setup image upload
+        function setupImageUpload() {
+            document.getElementById('imageInput').addEventListener('change', (e) => {
+                const files = e.target.files;
+                
+                Array.from(files).forEach(file => {
+                    if (uploadedImages.length >= 5) {
+                        showAlert('Maximum 5 images allowed', 'error');
+                        return;
+                    }
+                    
+                    if (file.size > 5 * 1024 * 1024) {
+                        showAlert(`${file.name} is too large (max 5MB)`, 'error');
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        uploadedImages.push(e.target.result);
+                        displayImages();
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+        }
+
+        // Display images
+        function displayImages() {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = uploadedImages.map((img, index) => `
+                <div class="preview-item">
+                    <img src="${img}" alt="Preview">
+                    <button class="remove-btn" onclick="removeImage(${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        // Remove image
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            displayImages();
+        }
+
+        // Setup form submit
+        function setupFormSubmit() {
+            document.getElementById('productForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                console.log('=== FORM SUBMITTED ===');
+                
+                // Get button elements
+                const publishBtn = document.getElementById('publishBtn');
+                const publishBtnText = document.getElementById('publishBtnText');
+                
+                // Disable button
+                publishBtn.disabled = true;
+                publishBtnText.textContent = '⏳ Publishing...';
+                
+                try {
+                    // Validate
+                    if (selectedCategories.length === 0) {
+                        throw new Error('Please select at least one category');
+                    }
+                    
+                    if (uploadedImages.length === 0) {
+                        throw new Error('Please upload at least one image');
+                    }
+                    
+                    // Create product
+                    const product = {
+                        id: Date.now(),
+                        name: document.getElementById('productName').value.trim(),
+                        description: document.getElementById('productDescription').value.trim(),
+                        category: selectedCategories.join(', '),
+                        price: parseFloat(document.getElementById('productPrice').value),
+                        stock: parseInt(document.getElementById('productStock').value),
+                        brand: document.getElementById('productBrand').value.trim() || 'Generic',
+                        condition: document.getElementById('productCondition').value,
+                        warranty: document.getElementById('productWarranty').value.trim() || 'No warranty',
+                        imageUrl: uploadedImages[0],
+                        images: uploadedImages,
+                        sellerId: currentUser.id,
+                        status: 'ACTIVE',
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    console.log('Product created:', product);
+                    
+                    // Save to localStorage
+                    const products = JSON.parse(localStorage.getItem('products') || '[]');
+                    products.push(product);
+                    localStorage.setItem('products', JSON.stringify(products));
+                    
+                    console.log('✅ Product saved to localStorage');
+                    console.log('Total products:', products.length);
+                    
+                    // Success
+                    publishBtnText.textContent = '✅ Published!';
+                    showAlert('✅ Item published successfully! Redirecting...', 'success');
+                    
+                    // Redirect to seller dashboard
+                    setTimeout(() => {
+                        window.location.href = 'seller-dashboard.html?itemAdded=true';
+                    }, 1500);
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    publishBtn.disabled = false;
+                    publishBtnText.textContent = '📤 Publish Item';
+                    showAlert(error.message, 'error');
+                }
+            });
+        }
+
+        // Show alert
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+    </script>
+</body>
+</html>

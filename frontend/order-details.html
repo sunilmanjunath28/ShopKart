@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - ShopKart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .navbar a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 20px;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+
+        .navbar a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .order-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .order-id {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .order-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-shipped {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .status-delivered {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .product-section, .summary-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .product-card {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .product-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .product-info h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .product-detail {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-top: 10px;
+        }
+
+        .shipping-section {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 2px solid #ffc107;
+        }
+
+        .shipping-section h4 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .shipping-address {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+            padding-top: 15px;
+            margin-top: 10px;
+            border-top: 2px solid #333;
+        }
+
+        .summary-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .summary-total {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-track {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-contact {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-card {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <h1>🛒 ShopKart</h1>
+    <a href="orders.html">← Back to Orders</a>
+</div>
+
+<div class="container">
+    <div class="order-header">
+        <div class="order-id" id="orderId"></div>
+        <div class="order-date" id="orderDate"></div>
+        <span class="status-badge" id="orderStatus"></span>
+    </div>
+
+    <div class="content-grid">
+        <!-- Left: Product Details -->
+        <div class="product-section">
+            <div class="section-title">📦 Order Items</div>
+            <div id="productDetails"></div>
+
+            <div class="shipping-section">
+                <h4>📍 Shipping Address</h4>
+                <div class="shipping-address" id="shippingAddress"></div>
+            </div>
+        </div>
+
+        <!-- Right: Order Summary -->
+        <div class="summary-section">
+            <div class="section-title">💰 Order Summary</div>
+            <div id="orderSummary"></div>
+
+            <div class="action-buttons">
+                <button class="btn btn-track" onclick="trackOrder()">📍 Track Order</button>
+                <button class="btn btn-contact" onclick="contactSeller()">📞 Contact Seller</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentOrder = null;
+
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('id');
+    
+    if (!orderId) {
+        alert('Order not found');
+        window.location.href = 'orders.html';
+        return;
+    }
+
+    loadOrderDetails(orderId);
+});
+
+function loadOrderDetails(orderId) {
+    // Load from localStorage
+    const ordersStr = localStorage.getItem('orders');
+    const orders = ordersStr ? JSON.parse(ordersStr) : [];
+    
+    currentOrder = orders.find(o => o.id == orderId);
+    
+    if (!currentOrder) {
+        alert('Order not found');
+        window.location.href = 'orders.html';
+        return;
+    }
+
+    displayOrderDetails();
+}
+
+function displayOrderDetails() {
+    const order = currentOrder;
+    
+    // Order header
+    document.getElementById('orderId').textContent = `Order #${order.id}`;
+    document.getElementById('orderDate').textContent = `Placed on ${new Date(order.createdAt).toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    })}`;
+    
+    const statusBadge = document.getElementById('orderStatus');
+    statusBadge.textContent = order.status;
+    statusBadge.className = `status-badge status-${order.status.toLowerCase()}`;
+    
+    // Product details
+    document.getElementById('productDetails').innerHTML = `
+        <div class="product-card">
+            <img src="${order.productImage || 'https://via.placeholder.com/150'}" 
+                 alt="${order.productName}" 
+                 class="product-image"
+                 onerror="this.src='https://via.placeholder.com/150'">
+            <div class="product-info">
+                <h3>${order.productName}</h3>
+                <div class="product-detail">📦 Quantity: ${order.quantity}</div>
+                <div class="product-detail">💰 Price per item: ₹${(order.totalPrice / order.quantity).toFixed(2)}</div>
+                ${order.productDescription ? `<div class="product-detail" style="margin-top: 10px;">${order.productDescription}</div>` : ''}
+                <div class="product-price">₹${order.totalPrice.toFixed(2)}</div>
+            </div>
+        </div>
+    `;
+    
+    // Shipping address
+    document.getElementById('shippingAddress').textContent = order.shippingAddress || 'Not provided';
+    
+    // Order summary
+    const subtotal = order.totalPrice;
+    const shipping = 0; // Free shipping
+    const tax = subtotal * 0.18; // 18% GST
+    const total = subtotal + shipping + tax;
+    
+    document.getElementById('orderSummary').innerHTML = `
+        <div class="summary-row">
+            <span class="summary-label">Subtotal</span>
+            <span class="summary-value">₹${subtotal.toFixed(2)}</span>
+        </div>
+        <div class="summary-row">
+            <span class="summary-label">Shipping</span>
+            <span class="summary-value" style="color: #4CAF50;">FREE</span>
+        </div>
+        <div class="summary-row">
+            <span class="summary-label">Tax (GST 18%)</span>
+            <span class="summary-value">₹${tax.toFixed(2)}</span>
+        </div>
+        <div class="summary-row">
+            <span class="summary-label" style="font-size: 18px; color: #333; font-weight: 700;">Total</span>
+            <span class="summary-total">₹${total.toFixed(2)}</span>
+        </div>
+    `;
+}
+
+function trackOrder() {
+    alert(`📍 Tracking Order #${currentOrder.id}\n\nStatus: ${currentOrder.status}\n\nFeature coming soon!`);
+}
+
+function contactSeller() {
+    if (currentOrder.sellerPhone) {
+        if (confirm(`Contact seller at: ${currentOrder.sellerPhone}\n\nWould you like to call?`)) {
+            window.location.href = `tel:${currentOrder.sellerPhone}`;
+        }
+    } else {
+        alert('Seller contact information not available');
+    }
+}
+</script>
+
+</body>
+</html>

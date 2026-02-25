@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Storage - ShopKart</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        h1 { color: #333; margin-bottom: 20px; }
+        .info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .info-item:last-child { border-bottom: none; }
+        .label { font-weight: 600; color: #666; }
+        .value { color: #333; font-weight: 700; }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        .btn-danger {
+            background: #e94560;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #d63447;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 2px solid #ffeaa7;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 2px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Storage Management</h1>
+        <p>Manage your browser storage to free up space</p>
+        
+        <div class="info" id="storageInfo">
+            <div class="info-item">
+                <span class="label">Total Products:</span>
+                <span class="value" id="totalProducts">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Storage Used:</span>
+                <span class="value" id="storageUsed">0 KB</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Your Products:</span>
+                <span class="value" id="userProducts">0</span>
+            </div>
+        </div>
+        
+        <div id="messageContainer"></div>
+        
+        <div class="warning">
+            ⚠️ <strong>Warning:</strong> Clearing storage will delete all products. This action cannot be undone!
+        </div>
+        
+        <div>
+            <button class="btn btn-danger" onclick="clearAllProducts()">🗑️ Clear All Products</button>
+            <button class="btn btn-secondary" onclick="window.location.href='seller-dashboard.html'">← Back to Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        // Load storage info
+        window.addEventListener('DOMContentLoaded', () => {
+            updateStorageInfo();
+        });
+
+        function updateStorageInfo() {
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userProducts = products.filter(p => p.sellerId == user.id);
+            
+            // Calculate storage size
+            const storageSize = new Blob([localStorage.getItem('products') || '[]']).size;
+            const sizeInKB = (storageSize / 1024).toFixed(2);
+            
+            document.getElementById('totalProducts').textContent = products.length;
+            document.getElementById('storageUsed').textContent = sizeInKB + ' KB';
+            document.getElementById('userProducts').textContent = userProducts.length;
+        }
+
+        function clearAllProducts() {
+            if (!confirm('Are you sure you want to delete ALL products? This cannot be undone!')) {
+                return;
+            }
+            
+            if (!confirm('This will delete ' + JSON.parse(localStorage.getItem('products') || '[]').length + ' products. Are you absolutely sure?')) {
+                return;
+            }
+            
+            try {
+                localStorage.removeItem('products');
+                
+                const messageContainer = document.getElementById('messageContainer');
+                messageContainer.innerHTML = '<div class="success">✅ All products cleared successfully! Storage freed up.</div>';
+                
+                updateStorageInfo();
+                
+                setTimeout(() => {
+                    window.location.href = 'seller-dashboard.html';
+                }, 2000);
+            } catch (error) {
+                const messageContainer = document.getElementById('messageContainer');
+                messageContainer.innerHTML = '<div class="warning">❌ Error: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>

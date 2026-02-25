@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Products - ShopKart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 { color: #667eea; margin-bottom: 10px; }
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 15px 30px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .output {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .step {
+            background: #f0f4ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Fix Products Tool</h1>
+        <p>This tool will fix the seller ID mismatch issue</p>
+        
+        <div class="warning">
+            <strong>⚠️ What this does:</strong><br>
+            Updates all products in localStorage to have your current user ID
+        </div>
+        
+        <div class="step">
+            <strong>Step 1:</strong> Check current status
+            <button class="btn btn-primary" onclick="checkStatus()">🔍 Check Status</button>
+        </div>
+        
+        <div class="step">
+            <strong>Step 2:</strong> Fix all products
+            <button class="btn btn-success" onclick="fixProducts()">✅ Fix Products</button>
+        </div>
+        
+        <div class="step">
+            <strong>Step 3:</strong> Go to dashboard
+            <button class="btn btn-primary" onclick="window.location.href='seller-dashboard.html'">📊 Open Dashboard</button>
+        </div>
+        
+        <div id="output" class="output">Click "Check Status" to begin...</div>
+    </div>
+
+    <script>
+        function log(message) {
+            document.getElementById('output').textContent = message;
+            console.log(message);
+        }
+
+        function checkStatus() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            
+            if (!user.id) {
+                log('❌ ERROR: No user found!\n\nPlease login first, then come back to this page.');
+                return;
+            }
+            
+            let output = '=== CURRENT STATUS ===\n\n';
+            output += `Your User ID: ${user.id} (type: ${typeof user.id})\n`;
+            output += `Total Products: ${products.length}\n\n`;
+            
+            if (products.length === 0) {
+                output += '❌ No products found in storage.\n';
+                output += 'Add some products first using add-item.html';
+                log(output);
+                return;
+            }
+            
+            let matchCount = 0;
+            let mismatchCount = 0;
+            
+            output += 'PRODUCTS:\n';
+            output += '─'.repeat(50) + '\n';
+            
+            products.forEach((p, i) => {
+                const match = p.sellerId == user.id;
+                if (match) matchCount++;
+                else mismatchCount++;
+                
+                output += `${i+1}. ${p.name}\n`;
+                output += `   Seller ID: ${p.sellerId} (type: ${typeof p.sellerId})\n`;
+                output += `   Match: ${match ? '✅ YES' : '❌ NO'}\n\n`;
+            });
+            
+            output += '─'.repeat(50) + '\n';
+            output += `\nSUMMARY:\n`;
+            output += `✅ Matching products: ${matchCount}\n`;
+            output += `❌ Mismatched products: ${mismatchCount}\n\n`;
+            
+            if (mismatchCount > 0) {
+                output += `⚠️ ${mismatchCount} products need to be fixed!\n`;
+                output += `Click "Fix Products" button to update them.`;
+            } else {
+                output += `✅ All products are correctly assigned to you!\n`;
+                output += `You can go to the dashboard now.`;
+            }
+            
+            log(output);
+        }
+
+        function fixProducts() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            
+            if (!user.id) {
+                log('❌ ERROR: No user found! Please login first.');
+                return;
+            }
+            
+            if (products.length === 0) {
+                log('❌ ERROR: No products to fix!');
+                return;
+            }
+            
+            let output = '=== FIXING PRODUCTS ===\n\n';
+            output += `Your User ID: ${user.id}\n`;
+            output += `Total Products: ${products.length}\n\n`;
+            
+            let fixedCount = 0;
+            
+            products.forEach((p, i) => {
+                const oldSellerId = p.sellerId;
+                const needsFix = p.sellerId != user.id;
+                
+                if (needsFix) {
+                    p.sellerId = user.id;
+                    fixedCount++;
+                    output += `${i+1}. ${p.name}\n`;
+                    output += `   Changed: ${oldSellerId} → ${user.id} ✅\n\n`;
+                }
+            });
+            
+            // Save back to localStorage
+            localStorage.setItem('products', JSON.stringify(products));
+            
+            output += '─'.repeat(50) + '\n';
+            output += `\n✅ FIXED ${fixedCount} products!\n\n`;
+            output += `All products now have seller ID: ${user.id}\n\n`;
+            output += `Click "Open Dashboard" to see the results!`;
+            
+            log(output);
+            
+            // Show success message
+            const container = document.querySelector('.container');
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.innerHTML = `<strong>✅ Success!</strong><br>Fixed ${fixedCount} products. Go to dashboard to see them!`;
+            container.insertBefore(successDiv, container.firstChild);
+        }
+    </script>
+</body>
+</html>

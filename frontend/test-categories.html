@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Categories</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 { color: #667eea; }
+        .category-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .category-option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+        .category-option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateY(-3px);
+        }
+        .category-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-family: monospace;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover { background: #5568d3; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🏷️ Test Category Selection</h1>
+        <p>Click on categories to select them (max 2)</p>
+        
+        <div class="category-options" id="categoryOptions">
+            <!-- Categories will be loaded here -->
+        </div>
+        
+        <div class="result" id="result" style="display: none;"></div>
+        
+        <button onclick="showSelected()">Show Selected Categories</button>
+        <button onclick="clearSelection()">Clear Selection</button>
+    </div>
+
+    <script>
+        const categories = [
+            { name: 'Groceries', icon: '🛒' },
+            { name: 'Electronics', icon: '📱' },
+            { name: 'Fashion', icon: '👗' },
+            { name: 'Gadgets', icon: '⌚' },
+            { name: 'Home Appliances', icon: '🏠' },
+            { name: 'Kitchen Items', icon: '🍳' },
+            { name: 'Toys', icon: '🧸' },
+            { name: 'Books', icon: '📚' },
+            { name: 'Sports', icon: '⚽' },
+            { name: 'Beauty', icon: '💄' },
+            { name: 'Furniture', icon: '🛋️' },
+            { name: 'Automotive', icon: '🚗' },
+            { name: 'Baby Products', icon: '👶' },
+            { name: 'Pet Supplies', icon: '🐾' },
+            { name: 'Health & Wellness', icon: '💊' },
+            { name: 'Jewelry', icon: '💍' },
+            { name: 'Office Supplies', icon: '📎' },
+            { name: 'Garden', icon: '🌱' },
+            { name: 'Music', icon: '🎸' },
+            { name: 'Gaming', icon: '🎮' }
+        ];
+
+        let selectedCategories = [];
+
+        function loadCategories() {
+            const container = document.getElementById('categoryOptions');
+            
+            container.innerHTML = categories.map(cat => `
+                <div class="category-option" data-category="${cat.name}">
+                    ${cat.icon} ${cat.name}
+                </div>
+            `).join('');
+            
+            // Add click handlers
+            document.querySelectorAll('.category-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    
+                    if (this.classList.contains('selected')) {
+                        // Deselect
+                        this.classList.remove('selected');
+                        selectedCategories = selectedCategories.filter(c => c !== category);
+                        console.log('Deselected:', category);
+                    } else if (selectedCategories.length < 2) {
+                        // Select (max 2)
+                        this.classList.add('selected');
+                        selectedCategories.push(category);
+                        console.log('Selected:', category);
+                    } else {
+                        alert('Maximum 2 categories allowed');
+                    }
+                    
+                    updateResult();
+                });
+            });
+            
+            console.log('Categories loaded');
+        }
+
+        function updateResult() {
+            const result = document.getElementById('result');
+            result.style.display = 'block';
+            result.textContent = `Selected: ${selectedCategories.length}/2\n\nCategories: ${selectedCategories.join(', ') || 'None'}`;
+        }
+
+        function showSelected() {
+            if (selectedCategories.length === 0) {
+                alert('No categories selected');
+            } else {
+                alert(`Selected Categories:\n\n${selectedCategories.join('\n')}`);
+            }
+        }
+
+        function clearSelection() {
+            selectedCategories = [];
+            document.querySelectorAll('.category-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            updateResult();
+        }
+
+        // Load on page load
+        window.onload = loadCategories;
+    </script>
+</body>
+</html>

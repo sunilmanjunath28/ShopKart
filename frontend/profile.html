@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile - ShopKart</title>
+
+<style>
+body{
+    background:#f5f5f5;
+    font-family: Arial, sans-serif;
+    margin:0;
+}
+.navbar{
+    background:#2874f0;
+    padding:15px;
+    color:white;
+    font-weight:bold;
+}
+.container{
+    max-width:800px;
+    margin:40px auto;
+    padding:0 20px;
+}
+.card{
+    background:white;
+    padding:30px;
+    border-radius:8px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+.profile-image{
+    width:130px;
+    height:130px;
+    border-radius:50%;
+    display:block;
+    margin:0 auto 15px;
+    border:3px solid #fb641b;
+    object-fit:cover;
+}
+.center{text-align:center;}
+.form-group{margin-bottom:18px;}
+.form-group label{font-weight:600;display:block;margin-bottom:6px;}
+.form-group input{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+.btn{
+    background:#fb641b;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:5px;
+    cursor:pointer;
+    font-weight:bold;
+}
+.btn:hover{background:#e55a12;}
+.btn-cancel{
+    background:gray;
+    margin-left:10px;
+}
+.error{color:red;font-size:13px;}
+.hidden{display:none;}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">ShopKart - My Profile</div>
+
+<div class="container">
+
+<!-- PROFILE VIEW -->
+<div id="profileView" class="card center">
+
+    <img id="viewImage" class="profile-image" src="">
+    <h2 id="viewName">User Name</h2>
+    <p id="viewEmail"></p>
+    <p id="viewPhone"></p>
+    <p id="viewLocation"></p>
+
+    <br>
+    <button class="btn" onclick="openEdit()">Edit Profile</button>
+</div>
+
+
+<!-- EDIT PROFILE FORM -->
+<div id="editProfile" class="card hidden">
+
+    <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" id="fullName">
+        <div class="error" id="nameError"></div>
+    </div>
+
+    <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="email">
+        <div class="error" id="emailError"></div>
+    </div>
+
+    <div class="form-group">
+        <label>Mobile Number *</label>
+        <input type="tel" id="phone">
+        <div class="error" id="phoneError"></div>
+    </div>
+
+    <div class="form-group">
+        <label>City *</label>
+        <input type="text" id="city">
+        <div class="error" id="cityError"></div>
+    </div>
+
+    <div class="form-group">
+        <label>Pincode *</label>
+        <input type="text" id="pincode">
+        <div class="error" id="pincodeError"></div>
+    </div>
+
+    <div class="form-group">
+        <label>Select Profile Image *</label>
+        <input type="file" id="profileImageInput" accept="image/*">
+    </div>
+
+    <button class="btn" onclick="saveProfile()">Save Profile</button>
+    <button class="btn btn-cancel" onclick="cancelEdit()">Cancel</button>
+
+</div>
+
+</div>
+
+<script>
+
+let currentUser = {};
+let selectedImageBase64 = "";
+
+/* Load Profile on Page Load */
+window.onload = function(){
+    // Check if user is logged in
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    if (!loggedInUser) {
+        window.location.href = "login.html";
+        return;
+    }
+    
+    const storedUser = localStorage.getItem("user");
+    if(storedUser){
+        currentUser = JSON.parse(storedUser);
+        
+        // Check if profile is complete
+        if(currentUser.phone && currentUser.city && currentUser.pincode){
+            // Profile exists - show profile view (don't redirect)
+            console.log("✅ Profile complete - showing profile view");
+            displayProfile();
+            document.getElementById("profileView").classList.remove("hidden");
+            document.getElementById("editProfile").classList.add("hidden");
+            return;
+        }
+    }
+    
+    // Profile incomplete - show edit form
+    console.log("⚠️ Profile incomplete - showing edit form");
+    document.getElementById("profileView").classList.add("hidden");
+    document.getElementById("editProfile").classList.remove("hidden");
+    openEdit();
+};
+
+/* Display Profile Details */
+function displayProfile(){
+
+    document.getElementById("viewName").textContent =
+        currentUser.name || "User Name";
+
+    document.getElementById("viewEmail").textContent =
+        currentUser.email || "";
+
+    document.getElementById("viewPhone").textContent =
+        currentUser.phone ? "📱 " + currentUser.phone : "";
+
+    document.getElementById("viewLocation").textContent =
+        currentUser.city && currentUser.pincode ?
+        "📍 " + currentUser.city + " - " + currentUser.pincode : "";
+
+    if(currentUser.profileImage){
+        document.getElementById("viewImage").src =
+            currentUser.profileImage;
+    } else {
+        document.getElementById("viewImage").src =
+            "https://ui-avatars.com/api/?name=" +
+            encodeURIComponent(currentUser.name || "User");
+    }
+}
+
+/* Open Edit Form */
+function openEdit(){
+
+    document.getElementById("profileView").classList.add("hidden");
+    document.getElementById("editProfile").classList.remove("hidden");
+
+    document.getElementById("fullName").value =
+        currentUser.name || "";
+
+    document.getElementById("email").value =
+        currentUser.email || "";
+
+    document.getElementById("phone").value =
+        currentUser.phone || "";
+
+    document.getElementById("city").value =
+        currentUser.city || "";
+
+    document.getElementById("pincode").value =
+        currentUser.pincode || "";
+}
+
+/* Cancel Edit */
+function cancelEdit(){
+    document.getElementById("editProfile").classList.add("hidden");
+    document.getElementById("profileView").classList.remove("hidden");
+}
+
+/* Image to Base64 */
+document.getElementById("profileImageInput")
+.addEventListener("change", function(e){
+
+    const file = e.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event){
+        selectedImageBase64 = event.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+
+/* Save Profile */
+function saveProfile(){
+
+    clearErrors();
+
+    const name = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const pincode = document.getElementById("pincode").value.trim();
+
+    let valid = true;
+
+    if(!name){
+        document.getElementById("nameError").textContent="Name required";
+        valid=false;
+    }
+
+    if(!email || !email.includes("@")){
+        document.getElementById("emailError").textContent="Valid email required";
+        valid=false;
+    }
+
+    if(!phone || phone.length<10){
+        document.getElementById("phoneError").textContent="Valid mobile required";
+        valid=false;
+    }
+
+    if(!city){
+        document.getElementById("cityError").textContent="City required";
+        valid=false;
+    }
+
+    if(!pincode || pincode.length<6){
+        document.getElementById("pincodeError").textContent="Valid pincode required";
+        valid=false;
+    }
+
+    if(!valid) return;
+
+    currentUser = {
+        name,
+        email,
+        phone,
+        city,
+        pincode,
+        profileImage:
+            selectedImageBase64 ||
+            currentUser.profileImage ||
+            ""
+    };
+
+    // Save to user object
+    localStorage.setItem("user", JSON.stringify(currentUser));
+    
+    // Save profile data separately (keyed by email)
+    const profileKey = 'profile_' + currentUser.email;
+    const profileData = {
+        name: currentUser.name,
+        phone: currentUser.phone,
+        city: currentUser.city,
+        pincode: currentUser.pincode,
+        profileImage: currentUser.profileImage
+    };
+    localStorage.setItem(profileKey, JSON.stringify(profileData));
+    console.log('💾 Profile saved for:', currentUser.email);
+
+    alert("✅ Profile Updated Successfully!");
+    
+    // Redirect to dashboard selection
+    window.location.href = "dashboard-select.html";
+}
+
+/* Clear Errors */
+function clearErrors(){
+    document.querySelectorAll(".error")
+        .forEach(e => e.textContent="");
+}
+
+/* Go to Dashboard */
+function goToDashboard(){
+    window.location.href = "dashboard-select.html";
+}
+
+</script>
+
+</body>
+</html>

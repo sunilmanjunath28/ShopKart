@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test localStorage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 { color: #667eea; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover { background: #5568d3; }
+        .result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { color: #4caf50; font-weight: bold; }
+        .error { color: #f44336; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🧪 localStorage Test</h1>
+        <p>Test if localStorage is working correctly</p>
+        
+        <button onclick="testLocalStorage()">1. Test localStorage</button>
+        <button onclick="checkProducts()">2. Check Products</button>
+        <button onclick="addTestProduct()">3. Add Test Product</button>
+        <button onclick="clearAll()">4. Clear All</button>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function log(message) {
+            const result = document.getElementById('result');
+            result.innerHTML += message + '\n';
+        }
+
+        function testLocalStorage() {
+            document.getElementById('result').innerHTML = '';
+            
+            try {
+                // Test if localStorage is available
+                if (typeof(Storage) !== "undefined") {
+                    log('✅ localStorage is SUPPORTED');
+                } else {
+                    log('❌ localStorage is NOT SUPPORTED');
+                    return;
+                }
+                
+                // Test write
+                localStorage.setItem('test', 'hello');
+                log('✅ Can WRITE to localStorage');
+                
+                // Test read
+                const value = localStorage.getItem('test');
+                if (value === 'hello') {
+                    log('✅ Can READ from localStorage');
+                } else {
+                    log('❌ Cannot read from localStorage');
+                }
+                
+                // Test remove
+                localStorage.removeItem('test');
+                log('✅ Can REMOVE from localStorage');
+                
+                log('\n<span class="success">localStorage is working perfectly!</span>');
+                
+            } catch (e) {
+                log('<span class="error">❌ ERROR: ' + e.message + '</span>');
+                log('\nPossible causes:');
+                log('- Browser in private/incognito mode');
+                log('- localStorage disabled in browser settings');
+                log('- Storage quota exceeded');
+            }
+        }
+
+        function checkProducts() {
+            document.getElementById('result').innerHTML = '';
+            
+            try {
+                const productsStr = localStorage.getItem('products');
+                
+                if (!productsStr) {
+                    log('📦 No products found in localStorage');
+                    log('Key: "products"');
+                    log('Value: null');
+                    return;
+                }
+                
+                const products = JSON.parse(productsStr);
+                log(`📦 Found ${products.length} products in localStorage`);
+                log('\nProducts:');
+                
+                if (products.length === 0) {
+                    log('(empty array)');
+                } else {
+                    products.forEach((p, i) => {
+                        log(`\n${i + 1}. ${p.name}`);
+                        log(`   ID: ${p.id}`);
+                        log(`   Price: ₹${p.price}`);
+                        log(`   Seller ID: ${p.sellerId}`);
+                        log(`   Created: ${new Date(p.createdAt).toLocaleString()}`);
+                    });
+                }
+                
+                // Check user
+                const userStr = localStorage.getItem('user');
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    log(`\n👤 Current User:`);
+                    log(`   ID: ${user.id}`);
+                    log(`   Name: ${user.name}`);
+                    
+                    const myProducts = products.filter(p => p.sellerId == user.id);
+                    log(`\n📊 Your Products: ${myProducts.length}`);
+                }
+                
+            } catch (e) {
+                log('<span class="error">❌ ERROR: ' + e.message + '</span>');
+            }
+        }
+
+        function addTestProduct() {
+            document.getElementById('result').innerHTML = '';
+            
+            try {
+                // Get or create user
+                let user = JSON.parse(localStorage.getItem('user') || 'null');
+                if (!user) {
+                    user = { id: 1, name: 'Test Seller', email: 'test@test.com' };
+                    localStorage.setItem('user', JSON.stringify(user));
+                    log('✅ Created test user');
+                }
+                
+                // Get products
+                const products = JSON.parse(localStorage.getItem('products') || '[]');
+                log(`📦 Current products: ${products.length}`);
+                
+                // Create test product
+                const testProduct = {
+                    id: Date.now(),
+                    name: 'Test Product ' + (products.length + 1),
+                    description: 'This is a test product',
+                    price: 999.99,
+                    stock: 10,
+                    category: 'Electronics',
+                    image: 'https://via.placeholder.com/300',
+                    images: ['https://via.placeholder.com/300'],
+                    seller: user.name,
+                    sellerId: user.id,
+                    sellerPhone: '+91 9876543210',
+                    brand: 'TestBrand',
+                    condition: 'New',
+                    warranty: '1 Year',
+                    status: 'ACTIVE',
+                    rating: 0,
+                    reviews: 0,
+                    createdAt: Date.now()
+                };
+                
+                // Add to array
+                products.push(testProduct);
+                
+                // Save
+                localStorage.setItem('products', JSON.stringify(products));
+                
+                log('✅ Test product added!');
+                log(`\nProduct Details:`);
+                log(`   Name: ${testProduct.name}`);
+                log(`   ID: ${testProduct.id}`);
+                log(`   Seller ID: ${testProduct.sellerId}`);
+                log(`   Price: ₹${testProduct.price}`);
+                log(`\n📦 Total products now: ${products.length}`);
+                
+                log('\n<span class="success">Product saved successfully!</span>');
+                log('\nNow check:');
+                log('- seller-dashboard.html (should show count)');
+                log('- my-items.html (should display product)');
+                log('- buy-dashboard.html (should show to buyers)');
+                
+            } catch (e) {
+                log('<span class="error">❌ ERROR: ' + e.message + '</span>');
+            }
+        }
+
+        function clearAll() {
+            if (confirm('Clear all products and user data?')) {
+                localStorage.removeItem('products');
+                localStorage.removeItem('user');
+                document.getElementById('result').innerHTML = '';
+                log('✅ All data cleared!');
+                log('\nYou can now test fresh:');
+                log('1. Click "Add Test Product"');
+                log('2. Go to seller-dashboard.html');
+                log('3. Check if count shows 1');
+            }
+        }
+
+        // Auto-run test on load
+        window.onload = function() {
+            testLocalStorage();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,956 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopKart - Online Shopping for Mobiles, Fashion, Electronics & More</title>
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 20px rgba(0,0,0,.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .header-container {
+            max-width: 1248px;
+            margin: 0 auto;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            text-decoration: none;
+            font-style: italic;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        .logo-subtitle {
+            font-size: 11px;
+            font-style: italic;
+            font-weight: 400;
+            color: #ffe500;
+            animation: pulse 2s infinite;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 560px;
+        }
+
+        .search-box {
+            display: flex;
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,.2);
+            transition: all 0.3s ease;
+        }
+
+        .search-box:hover {
+            box-shadow: 0 6px 25px rgba(0,0,0,.3);
+            transform: translateY(-2px);
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            background: transparent;
+        }
+
+        .search-box button {
+            padding: 0 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box button:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: scale(1.1);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            padding-right: 20px;
+        }
+
+        .login-btn {
+            background: white;
+            color: #667eea;
+            padding: 8px 35px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255,255,255,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            transition: left 0.5s;
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255,255,255,0.4);
+        }
+
+        .header-link {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .header-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: white;
+            transition: width 0.3s ease;
+        }
+
+        .header-link:hover::after {
+            width: 100%;
+        }
+
+        .header-link:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Banner Carousel */
+        .banner-carousel {
+            max-width: 1248px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            height: 320px;
+            box-shadow: 0 10px 40px rgba(0,0,0,.15);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .banner-slide {
+            display: none;
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .banner-slide.active {
+            display: flex;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .banner-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid white;
+        }
+
+        .dot:hover {
+            transform: scale(1.3);
+        }
+
+        .dot.active {
+            background: white;
+            width: 30px;
+            border-radius: 10px;
+        }
+
+        /* Categories Section */
+        .categories-section {
+            max-width: 1248px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px 0;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,.1);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+            padding: 0 30px;
+        }
+
+        .category-card {
+            text-align: center;
+            padding: 25px 15px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .category-card:hover::before {
+            opacity: 1;
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0,0,0,.15);
+        }
+
+        .category-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            transition: all 0.4s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .category-card:hover .category-icon {
+            transform: rotate(360deg) scale(1.1);
+            box-shadow: 0 10px 30px rgba(102,126,234,0.5);
+        }
+
+        .category-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #212121;
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover .category-name {
+            color: #667eea;
+            transform: scale(1.1);
+        }
+
+        /* Promotional Banners */
+        .promo-section {
+            max-width: 1248px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .promo-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,.1);
+            position: relative;
+        }
+
+        .promo-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .promo-card:hover::after {
+            opacity: 1;
+        }
+
+        .promo-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 50px rgba(0,0,0,.2);
+        }
+
+        .promo-image {
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .promo-image::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        .promo-card:hover .promo-image {
+            transform: scale(1.05);
+        }
+
+        .promo-image h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            z-index: 1;
+        }
+
+        .promo-image p {
+            font-size: 15px;
+            opacity: 0.95;
+            z-index: 1;
+        }
+
+        .promo-content {
+            padding: 20px;
+            text-align: center;
+            background: white;
+        }
+
+        .promo-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #212121;
+            margin-bottom: 6px;
+        }
+
+        .promo-subtitle {
+            font-size: 13px;
+            color: #878787;
+        }
+
+        /* Products Section */
+        .products-section {
+            max-width: 1248px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,.1);
+            animation: fadeInUp 1.4s ease-out;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #212121;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .view-all {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px solid #667eea;
+        }
+
+        .view-all:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102,126,234,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .product-card:hover::before {
+            left: 100%;
+        }
+
+        .product-card:hover {
+            border-color: #667eea;
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(102,126,234,0.3);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            transition: all 0.4s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        .product-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: #212121;
+            margin-bottom: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .product-rating {
+            display: inline-block;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(17,153,142,0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 50px 20px 25px;
+            margin-top: 50px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,.1);
+        }
+
+        .footer-container {
+            max-width: 1248px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: white;
+            transition: width 0.3s ease;
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        .footer-links a:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 18px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-wrap: wrap;
+                padding: 8px 12px;
+            }
+
+            .search-container {
+                order: 3;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .promo-section {
+                grid-template-columns: 1fr;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .banner-carousel {
+                height: 200px;
+            }
+
+            .banner-slide {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                ShopKart
+                <span class="logo-subtitle">Explore Plus+</span>
+            </a>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search for Products, Brands and More">
+                    <button onclick="searchProducts()">🔍</button>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a href="login.html" class="login-btn" id="loginBtn">Login</a>
+                <a href="#" class="header-link" id="becomeSellerLink" onclick="checkAuthAndRedirect(event, 'seller-dashboard.html')">Become a Seller</a>
+                <a href="#" class="header-link" id="moreLink">More</a>
+                <a href="#" class="header-link" id="cartLink" onclick="checkAuthAndRedirect(event, 'buy-dashboard.html')">🛒 Cart</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner Carousel -->
+    <div class="banner-carousel">
+        <div class="banner-slide active" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; color: white;">
+            <h2 style="font-size: 32px; margin-bottom: 12px;">Phone (4a) series</h2>
+            <p style="font-size: 18px; margin-bottom: 8px;">Launching 5th Mar</p>
+            <p style="font-size: 14px;">Get notified</p>
+        </div>
+        <div class="banner-slide" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; color: white;">
+            <h2 style="font-size: 32px; margin-bottom: 12px;">Made for the moves</h2>
+            <p style="font-size: 18px; margin-bottom: 8px;">Upto 80% Off</p>
+            <p style="font-size: 14px;">Comfort for every adventure</p>
+        </div>
+        <div class="banner-slide" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; color: white;">
+            <h2 style="font-size: 32px; margin-bottom: 12px;">Game without compromise</h2>
+            <p style="font-size: 18px; margin-bottom: 8px;">From ₹64,990*</p>
+            <p style="font-size: 14px;">Intel-powered gaming laptops</p>
+        </div>
+        <div class="banner-dots">
+            <span class="dot active" onclick="showSlide(0)"></span>
+            <span class="dot" onclick="showSlide(1)"></span>
+            <span class="dot" onclick="showSlide(2)"></span>
+        </div>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="categories-section">
+        <div class="categories-grid">
+            <div class="category-card" onclick="filterCategory('Fashion')">
+                <div class="category-icon">👕</div>
+                <div class="category-name">Fashion</div>
+            </div>
+            <div class="category-card" onclick="filterCategory('Travel')">
+                <div class="category-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">✈️</div>
+                <div class="category-name">Travel</div>
+            </div>
+            <div class="category-card" onclick="filterCategory('Electronics')">
+                <div class="category-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">📱</div>
+                <div class="category-name">Electronics</div>
+            </div>
+            <div class="category-card" onclick="filterCategory('Home & Kitchen')">
+                <div class="category-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">🏠</div>
+                <div class="category-name">Home & Kitchen</div>
+            </div>
+            <div class="category-card" onclick="filterCategory('Auto Accessories')">
+                <div class="category-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">🚗</div>
+                <div class="category-name">Auto Acc</div>
+            </div>
+            <div class="category-card" onclick="filterCategory('Toys')">
+                <div class="category-icon" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">🧸</div>
+                <div class="category-name">Toys, Baby</div>
+            </div>
+            <div class="category-card" onclick="filterCategory('Gen-Z Trends')">
+                <div class="category-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">🎯</div>
+                <div class="category-name">Gen-Z Trends</div>
+            </div>
+            <div class="category-card" onclick="filterCategory('Next Gen')">
+                <div class="category-icon" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">⚡</div>
+                <div class="category-name">Next Gen</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promotional Banners -->
+    <div class="promo-section">
+        <div class="promo-card">
+            <div class="promo-image" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                <h3>Phone Launch</h3>
+                <p>Snapdragon Series</p>
+            </div>
+            <div class="promo-content">
+                <div class="promo-title">NOTHING (5a)</div>
+                <div class="promo-subtitle">Launching 5th Mar</div>
+            </div>
+        </div>
+        <div class="promo-card">
+            <div class="promo-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h3>Fashion Sale</h3>
+                <p>Upto 80% Off</p>
+            </div>
+            <div class="promo-content">
+                <div class="promo-title">Made for the moves</div>
+                <div class="promo-subtitle">Comfort for every adventure</div>
+            </div>
+        </div>
+        <div class="promo-card">
+            <div class="promo-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <h3>Gaming Laptops</h3>
+                <p>From ₹64,990</p>
+            </div>
+            <div class="promo-content">
+                <div class="promo-title">Game without compromise</div>
+                <div class="promo-subtitle">Intel-powered gaming laptops</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="products-section">
+        <div class="section-header">
+            <h2 class="section-title">Best Deals on Smartphones</h2>
+            <a href="#" class="view-all" onclick="checkAuthAndRedirect(event, 'buy-dashboard.html')">VIEW ALL</a>
+        </div>
+        <div class="products-grid" id="productsGrid">
+            <div class="loading">Loading amazing products...</div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Contact Us</a>
+                <a href="#">Careers</a>
+                <a href="#">Press</a>
+                <a href="#">Corporate Information</a>
+            </div>
+            <p style="margin-top: 20px; font-size: 14px; color: #878787;">© 2026 ShopKart.com</p>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+        let currentSlide = 0;
+        let isLoggedIn = false;
+
+        // Check if user is logged in
+        function checkLogin() {
+            // Clear any existing login data to force fresh login
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            isLoggedIn = !!(token && user);
+            
+            // Always show "Login" button that goes to login page
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.textContent = 'Login';
+            loginBtn.href = 'login.html';
+            
+            // For testing: Set isLoggedIn to false to always require login
+            // Remove this line if you want to allow logged-in users to browse
+            isLoggedIn = false;
+        }
+
+        // Check authentication before redirecting
+        function checkAuthAndRedirect(event, targetPage) {
+            event.preventDefault();
+            
+            if (!isLoggedIn) {
+                // Store the intended destination
+                localStorage.setItem('redirectAfterLogin', targetPage);
+                alert('Please login first to access this feature');
+                window.location.href = 'login.html';
+            } else {
+                window.location.href = targetPage;
+            }
+        }
+
+        // Banner carousel
+        function showSlide(index) {
+            const slides = document.querySelectorAll('.banner-slide');
+            const dots = document.querySelectorAll('.dot');
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+        }
+
+        // Auto-rotate banners
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % 3;
+            showSlide(currentSlide);
+        }, 4000);
+
+        // Load products
+        async function loadProducts() {
+            try {
+                const response = await fetch(`${API_URL}/products`);
+                const products = await response.json();
+                
+                const grid = document.getElementById('productsGrid');
+                grid.innerHTML = products.slice(0, 6).map(product => `
+                    <div class="product-card" onclick="viewProduct(${product.id})">
+                        <img src="${product.imageUrl || 'https://via.placeholder.com/200'}" alt="${product.name}" class="product-image">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">₹${product.price.toFixed(2)}</div>
+                        <span class="product-rating">★ 4.5</span>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('productsGrid').innerHTML = '<p style="text-align: center; color: #999;">Unable to load products. Please try again later.</p>';
+            }
+        }
+
+        function searchProducts() {
+            const query = document.getElementById('searchInput').value;
+            if (query) {
+                if (!isLoggedIn) {
+                    alert('Please login first to search products');
+                    window.location.href = 'login.html';
+                } else {
+                    window.location.href = `buy-dashboard.html?search=${encodeURIComponent(query)}`;
+                }
+            }
+        }
+
+        function filterCategory(category) {
+            if (!isLoggedIn) {
+                alert('Please login first to browse products');
+                window.location.href = 'login.html';
+            } else {
+                window.location.href = `buy-dashboard.html?category=${encodeURIComponent(category)}`;
+            }
+        }
+
+        function viewProduct(id) {
+            if (!isLoggedIn) {
+                alert('Please login first to view products');
+                window.location.href = 'login.html';
+            } else {
+                window.location.href = `buy-dashboard.html?product=${id}`;
+            }
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            loadProducts();
+        });
+    </script>
+</body>
+</html>

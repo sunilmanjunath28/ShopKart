@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopKart - Your Premium Shopping Destination</title>
+    <link rel="stylesheet" href="css/modern-theme.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 6rem 2rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1.2s ease;
+        }
+
+        .hero-btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.125rem;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            text-decoration: none;
+            transition: all var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hero-btn-primary {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-btn-secondary:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 5rem 2rem;
+            background: var(--bg-primary);
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--radius-2xl);
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition-slow);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .feature-icon {
+            width: 4rem;
+            height: 4rem;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow-primary);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Categories Section */
+        .categories-showcase {
+            padding: 5rem 2rem;
+            background: white;
+        }
+
+        .section-header-center {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-title-large {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+
+        .categories-grid-modern {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .category-card-modern {
+            background: var(--bg-primary);
+            padding: 2rem 1rem;
+            border-radius: var(--radius-xl);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-slow);
+            border: 2px solid transparent;
+        }
+
+        .category-card-modern:hover {
+            background: white;
+            border-color: var(--primary-color);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .category-icon-modern {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .category-name-modern {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: var(--primary-gradient);
+            padding: 5rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-description {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+        }
+
+        /* Footer */
+        .modern-footer {
+            background: var(--text-primary);
+            color: white;
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color var(--transition-base);
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.125rem;
+            }
+
+            .section-title-large {
+                font-size: 2rem;
+            }
+
+            .cta-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modern Navbar -->
+    <nav class="modern-navbar">
+        <div class="navbar-container">
+            <a href="index-modern.html" class="navbar-logo">
+                🛒 ShopKart
+            </a>
+            <div class="navbar-menu">
+                <a href="#features" class="navbar-link">Features</a>
+                <a href="#categories" class="navbar-link">Categories</a>
+                <a href="buy-dashboard.html" class="navbar-link">Shop</a>
+                <a href="login.html" class="navbar-btn">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Your Premium Shopping Destination</h1>
+            <p class="hero-subtitle">Discover amazing products at unbeatable prices. Shop from thousands of sellers and get the best deals delivered to your doorstep.</p>
+            <div class="hero-buttons">
+                <a href="buy-dashboard.html" class="hero-btn hero-btn-primary">
+                    🛍️ Start Shopping
+                </a>
+                <a href="seller-dashboard.html" class="hero-btn hero-btn-secondary">
+                    💼 Become a Seller
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="section-header-center">
+            <h2 class="section-title-large">Why Choose ShopKart?</h2>
+            <p class="section-description">Experience the best online shopping with our premium features</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🚚</div>
+                <h3 class="feature-title">Fast Delivery</h3>
+                <p class="feature-description">Get your orders delivered quickly with our express shipping options</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Secure Payments</h3>
+                <p class="feature-description">Shop with confidence using our encrypted payment gateway</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💯</div>
+                <h3 class="feature-title">Quality Products</h3>
+                <p class="feature-description">All products are verified and quality-checked before shipping</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎁</div>
+                <h3 class="feature-title">Best Prices</h3>
+                <p class="feature-description">Enjoy competitive prices and exclusive deals on all products</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section id="categories" class="categories-showcase">
+        <div class="section-header-center">
+            <h2 class="section-title-large">Shop by Category</h2>
+            <p class="section-description">Browse through our wide range of product categories</p>
+        </div>
+        <div class="categories-grid-modern">
+            <div class="category-card-modern" onclick="goToShop('Electronics')">
+                <span class="category-icon-modern">📱</span>
+                <div class="category-name-modern">Electronics</div>
+            </div>
+            <div class="category-card-modern" onclick="goToShop('Fashion')">
+                <span class="category-icon-modern">👗</span>
+                <div class="category-name-modern">Fashion</div>
+            </div>
+            <div class="category-card-modern" onclick="goToShop('Home')">
+                <span class="category-icon-modern">🏠</span>
+                <div class="category-name-modern">Home & Living</div>
+            </div>
+            <div class="category-card-modern" onclick="goToShop('Beauty')">
+                <span class="category-icon-modern">💄</span>
+                <div class="category-name-modern">Beauty</div>
+            </div>
+            <div class="category-card-modern" onclick="goToShop('Sports')">
+                <span class="category-icon-modern">⚽</span>
+                <div class="category-name-modern">Sports</div>
+            </div>
+            <div class="category-card-modern" onclick="goToShop('Books')">
+                <span class="category-icon-modern">📚</span>
+                <div class="category-name-modern">Books</div>
+            </div>
+            <div class="category-card-modern" onclick="goToShop('Toys')">
+                <span class="category-icon-modern">🧸</span>
+                <div class="category-name-modern">Toys</div>
+            </div>
+            <div class="category-card-modern" onclick="goToShop('Gadgets')">
+                <span class="category-icon-modern">⌚</span>
+                <div class="category-name-modern">Gadgets</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to Start Shopping?</h2>
+            <p class="cta-description">Join thousands of happy customers and experience the best online shopping</p>
+            <a href="register.html" class="hero-btn hero-btn-primary">
+                Create Free Account
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="modern-footer">
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>About ShopKart</h3>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Customer Service</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Track Order</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Shipping Info</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Sell on ShopKart</h3>
+                <ul class="footer-links">
+                    <li><a href="seller-dashboard.html">Become a Seller</a></li>
+                    <li><a href="#">Seller Dashboard</a></li>
+                    <li><a href="#">Seller Guidelines</a></li>
+                    <li><a href="#">Seller Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Connect With Us</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Facebook</a></li>
+                    <li><a href="#">Twitter</a></li>
+                    <li><a href="#">Instagram</a></li>
+                    <li><a href="#">LinkedIn</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 ShopKart. All rights reserved. | Privacy Policy | Terms of Service</p>
+        </div>
+    </footer>
+
+    <script>
+        function goToShop(category) {
+            localStorage.setItem('selectedCategory', category);
+            window.location.href = 'buy-dashboard.html';
+        }
+    </script>
+</body>
+</html>

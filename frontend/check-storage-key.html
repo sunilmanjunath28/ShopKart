@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Storage Key</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #667eea; }
+        .result {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-family: monospace;
+        }
+        .key-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .key-item.has-data {
+            border-color: #4caf50;
+            background: #e8f5e9;
+        }
+        .count {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover { background: #5568d3; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🔍 Check localStorage Keys</h1>
+        <p>This page shows what keys are being used in your localStorage</p>
+        
+        <button onclick="checkKeys()">🔄 Check Now</button>
+        <button onclick="showAllKeys()">📋 Show All Keys</button>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function checkKeys() {
+            const result = document.getElementById('result');
+            let html = '<h3>Checking Common Keys:</h3>';
+            
+            // List of possible keys
+            const possibleKeys = [
+                'products',
+                'shopkart_products',
+                'my_products',
+                'ecommerce_products',
+                'store_products'
+            ];
+            
+            let foundKey = null;
+            let foundCount = 0;
+            
+            possibleKeys.forEach(key => {
+                const data = localStorage.getItem(key);
+                
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        const count = Array.isArray(parsed) ? parsed.length : 0;
+                        
+                        html += `
+                            <div class="key-item has-data">
+                                <strong>✅ Key: "${key}"</strong><br>
+                                <span class="count">${count} products</span><br>
+                                <small>This key has data!</small>
+                            </div>
+                        `;
+                        
+                        foundKey = key;
+                        foundCount = count;
+                    } catch (e) {
+                        html += `
+                            <div class="key-item">
+                                <strong>⚠️ Key: "${key}"</strong><br>
+                                Has data but not valid JSON
+                            </div>
+                        `;
+                    }
+                } else {
+                    html += `
+                        <div class="key-item">
+                            <strong>❌ Key: "${key}"</strong><br>
+                            <small>No data</small>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (foundKey) {
+                html += `
+                    <div style="background: #e8f5e9; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                        <h3 style="color: #4caf50; margin-top: 0;">✅ Found Active Key!</h3>
+                        <p><strong>Key:</strong> "${foundKey}"</p>
+                        <p><strong>Products:</strong> ${foundCount}</p>
+                        <p style="margin-bottom: 0;"><strong>Status:</strong> Your JavaScript files should use this key</p>
+                    </div>
+                `;
+                
+                // Check if JS files are using the correct key
+                html += `
+                    <div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                        <h3 style="margin-top: 0;">⚙️ Configuration</h3>
+                        <p>Make sure all your JavaScript files use:</p>
+                        <code style="background: #f8f9fa; padding: 10px; display: block; border-radius: 5px;">
+                            const STORAGE_KEY = '${foundKey}';
+                        </code>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                        <h3 style="margin-top: 0;">ℹ️ No Data Found</h3>
+                        <p>No products found in any common key.</p>
+                        <p>You can use any key you want. Recommended: <code>'products'</code></p>
+                    </div>
+                `;
+            }
+            
+            result.innerHTML = html;
+        }
+        
+        function showAllKeys() {
+            const result = document.getElementById('result');
+            let html = '<h3>All localStorage Keys:</h3>';
+            
+            if (localStorage.length === 0) {
+                html += '<p>localStorage is empty</p>';
+            } else {
+                html += '<div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">';
+                
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    const value = localStorage.getItem(key);
+                    
+                    let preview = value;
+                    if (value.length > 100) {
+                        preview = value.substring(0, 100) + '...';
+                    }
+                    
+                    html += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 5px;">
+                            <strong>${i + 1}. Key: "${key}"</strong><br>
+                            <small style="color: #666;">Length: ${value.length} characters</small><br>
+                            <code style="font-size: 11px; color: #999;">${preview}</code>
+                        </div>
+                    `;
+                }
+                
+                html += '</div>';
+            }
+            
+            result.innerHTML = html;
+        }
+        
+        // Auto-check on load
+        window.onload = checkKeys;
+    </script>
+</body>
+</html>

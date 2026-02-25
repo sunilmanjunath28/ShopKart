@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Complete Flow</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 { color: #667eea; }
+        h2 { color: #333; margin-top: 0; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover { background: #5568d3; }
+        button.danger { background: #f44336; }
+        button.danger:hover { background: #da190b; }
+        button.success { background: #4CAF50; }
+        button.success:hover { background: #45a049; }
+        .result {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🧪 Test Complete Flow</h1>
+        <p>This page tests the complete product flow: Add → Display → Count</p>
+    </div>
+
+    <div class="box">
+        <h2>Step 1: Check Current State</h2>
+        <button onclick="checkState()">🔍 Check Current State</button>
+        <div id="stateResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="box">
+        <h2>Step 2: Add Test Product</h2>
+        <button onclick="addTestProduct()" class="success">➕ Add Test Product</button>
+        <div id="addResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="box">
+        <h2>Step 3: Verify Product Count</h2>
+        <button onclick="verifyCount()">✅ Verify Count</button>
+        <div id="countResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="box">
+        <h2>Step 4: Navigation Links</h2>
+        <button onclick="window.location.href='seller-dashboard.html'">📊 Go to Seller Dashboard</button>
+        <button onclick="window.location.href='my-items.html'">📦 Go to My Items</button>
+        <button onclick="window.location.href='buy-dashboard.html'">🛒 Go to Buy Dashboard</button>
+    </div>
+
+    <div class="box">
+        <h2>Cleanup</h2>
+        <button onclick="clearAllData()" class="danger">🗑️ Clear All Data</button>
+        <div id="clearResult" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'products';
+
+        function checkState() {
+            const result = document.getElementById('stateResult');
+            result.style.display = 'block';
+            
+            try {
+                // Check user
+                const userStr = localStorage.getItem('user');
+                const user = userStr ? JSON.parse(userStr) : null;
+                
+                // Check products
+                const productsStr = localStorage.getItem(STORAGE_KEY);
+                const products = productsStr ? JSON.parse(productsStr) : [];
+                
+                // Filter by user
+                const userProducts = user ? products.filter(p => p.sellerId == user.id) : [];
+                
+                let output = '=== CURRENT STATE ===\n\n';
+                output += `User: ${user ? JSON.stringify(user, null, 2) : 'Not set'}\n\n`;
+                output += `Total Products in Storage: ${products.length}\n`;
+                output += `Your Products: ${userProducts.length}\n\n`;
+                
+                if (products.length > 0) {
+                    output += 'All Products:\n';
+                    products.forEach((p, i) => {
+                        const isYours = user && p.sellerId == user.id;
+                        output += `${i + 1}. ${p.name} (ID: ${p.id}, Seller: ${p.sellerId}) ${isYours ? '✅ YOURS' : ''}\n`;
+                    });
+                }
+                
+                result.textContent = output;
+                
+                // Show status
+                if (user && userProducts.length > 0) {
+                    showStatus('success', `✅ Found ${userProducts.length} product(s) for user ${user.id}`);
+                } else if (user) {
+                    showStatus('info', `ℹ️ User exists but no products yet`);
+                } else {
+                    showStatus('error', '❌ No user found');
+                }
+            } catch (e) {
+                result.textContent = 'Error: ' + e.message;
+                showStatus('error', '❌ Error checking state');
+            }
+        }
+
+        function addTestProduct() {
+            const result = document.getElementById('addResult');
+            result.style.display = 'block';
+            
+            try {
+                // Get or create user
+                let userStr = localStorage.getItem('user');
+                let user;
+                
+                if (!userStr) {
+                    user = { id: 1, name: 'Test Seller', email: 'seller@test.com' };
+                    localStorage.setItem('user', JSON.stringify(user));
+                    result.textContent = '✅ Created default user\n\n';
+                } else {
+                    user = JSON.parse(userStr);
+                    result.textContent = '✅ Using existing user\n\n';
+                }
+                
+                // Create test product
+                const product = {
+                    id: Date.now(),
+                    name: 'Test Product ' + new Date().toLocaleTimeString(),
+                    description: 'This is a test product created at ' + new Date().toLocaleString(),
+                    price: 999.99,
+                    stock: 10,
+                    category: 'Electronics',
+                    image: 'https://via.placeholder.com/300',
+                    images: ['https://via.placeholder.com/300'],
+                    seller: user.name,
+                    sellerId: user.id,
+                    sellerPhone: '+91 9876543210',
+                    brand: 'Test Brand',
+                    condition: 'New',
+                    warranty: '1 Year',
+                    status: 'ACTIVE',
+                    rating: 0,
+                    reviews: 0,
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Get existing products
+                const productsStr = localStorage.getItem(STORAGE_KEY);
+                const products = productsStr ? JSON.parse(productsStr) : [];
+                
+                // Add new product
+                products.push(product);
+                
+                // Save
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+                
+                result.textContent += `Product Created:\n`;
+                result.textContent += `- ID: ${product.id}\n`;
+                result.textContent += `- Name: ${product.name}\n`;
+                result.textContent += `- Seller ID: ${product.sellerId}\n`;
+                result.textContent += `- Price: ₹${product.price}\n\n`;
+                result.textContent += `✅ Saved to localStorage\n`;
+                result.textContent += `Total products now: ${products.length}`;
+                
+                showStatus('success', '✅ Test product added successfully!');
+                
+                // Auto-verify after 500ms
+                setTimeout(verifyCount, 500);
+            } catch (e) {
+                result.textContent = 'Error: ' + e.message;
+                showStatus('error', '❌ Error adding product');
+            }
+        }
+
+        function verifyCount() {
+            const result = document.getElementById('countResult');
+            result.style.display = 'block';
+            
+            try {
+                // Get user
+                const userStr = localStorage.getItem('user');
+                const user = userStr ? JSON.parse(userStr) : null;
+                
+                if (!user) {
+                    result.textContent = '❌ No user found. Please add a test product first.';
+                    showStatus('error', '❌ No user found');
+                    return;
+                }
+                
+                // Get products
+                const productsStr = localStorage.getItem(STORAGE_KEY);
+                const products = productsStr ? JSON.parse(productsStr) : [];
+                
+                // Filter by user
+                const userProducts = products.filter(p => p.sellerId == user.id);
+                
+                let output = '=== VERIFICATION ===\n\n';
+                output += `User ID: ${user.id} (${typeof user.id})\n`;
+                output += `Total Products: ${products.length}\n`;
+                output += `Your Products: ${userProducts.length}\n\n`;
+                
+                if (userProducts.length > 0) {
+                    output += 'Your Products:\n';
+                    userProducts.forEach((p, i) => {
+                        output += `${i + 1}. ${p.name}\n`;
+                        output += `   - ID: ${p.id}\n`;
+                        output += `   - Seller ID: ${p.sellerId} (${typeof p.sellerId})\n`;
+                        output += `   - Match: ${p.sellerId == user.id ? 'YES ✅' : 'NO ❌'}\n\n`;
+                    });
+                    
+                    output += `\n✅ SUCCESS! Found ${userProducts.length} product(s)\n`;
+                    output += `\nThis count should appear in:\n`;
+                    output += `- Seller Dashboard "Total Products"\n`;
+                    output += `- My Items page\n`;
+                    
+                    showStatus('success', `✅ Verification passed! ${userProducts.length} product(s) found`);
+                } else {
+                    output += '❌ No products found for this user\n';
+                    output += '\nPossible issues:\n';
+                    output += '- sellerId mismatch\n';
+                    output += '- Products not saved correctly\n';
+                    
+                    showStatus('error', '❌ No products found');
+                }
+                
+                result.textContent = output;
+            } catch (e) {
+                result.textContent = 'Error: ' + e.message;
+                showStatus('error', '❌ Error verifying count');
+            }
+        }
+
+        function clearAllData() {
+            if (!confirm('Are you sure you want to clear ALL data?')) {
+                return;
+            }
+            
+            const result = document.getElementById('clearResult');
+            result.style.display = 'block';
+            
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem('user');
+                
+                result.textContent = '✅ All data cleared!\n\n';
+                result.textContent += 'Cleared:\n';
+                result.textContent += '- Products\n';
+                result.textContent += '- User\n';
+                
+                showStatus('success', '✅ All data cleared');
+                
+                // Clear other results
+                document.getElementById('stateResult').style.display = 'none';
+                document.getElementById('addResult').style.display = 'none';
+                document.getElementById('countResult').style.display = 'none';
+            } catch (e) {
+                result.textContent = 'Error: ' + e.message;
+                showStatus('error', '❌ Error clearing data');
+            }
+        }
+
+        function showStatus(type, message) {
+            const existing = document.querySelector('.status');
+            if (existing) existing.remove();
+            
+            const status = document.createElement('div');
+            status.className = `status ${type}`;
+            status.textContent = message;
+            document.body.insertBefore(status, document.body.firstChild);
+            
+            setTimeout(() => status.remove(), 5000);
+        }
+
+        // Auto-check on load
+        window.onload = checkState;
+    </script>
+</body>
+</html>

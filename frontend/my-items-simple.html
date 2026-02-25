@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Items - ShopKart</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .header h1 { color: #333; margin-bottom: 10px; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-number { font-size: 32px; font-weight: bold; }
+        .stat-label { font-size: 14px; opacity: 0.9; margin-top: 5px; }
+        .toolbar {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffa500; color: white; }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+        .product-info { padding: 20px; }
+        .product-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .product-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        .product-details {
+            font-size: 14px;
+            color: #666;
+            margin: 5px 0;
+        }
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn-edit { background: #667eea; color: white; flex: 1; }
+        .btn-delete { background: #e94560; color: white; flex: 1; }
+        .empty-state {
+            background: white;
+            padding: 60px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .empty-state h3 { color: #333; margin: 20px 0; }
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📦 My Published Items</h1>
+            <p>Manage your product inventory</p>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalItems">0</div>
+                    <div class="stat-label">Total Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="activeItems">0</div>
+                    <div class="stat-label">Active Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalValue">₹0</div>
+                    <div class="stat-label">Total Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="lowStock">0</div>
+                    <div class="stat-label">Low Stock</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert -->
+        <div id="alertContainer"></div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <a href="add-item.html" class="btn btn-success">➕ Add New Item</a>
+            <button class="btn btn-primary" onclick="loadProducts()">🔄 Refresh</button>
+            <button class="btn btn-warning" onclick="showDebug()">🔍 Debug</button>
+            <a href="seller-dashboard.html" class="btn btn-primary">📊 Dashboard</a>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" id="productsGrid">
+            <div class="empty-state">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let allProducts = [];
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('=== PAGE LOADED ===');
+            
+            // Get user
+            const userStr = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+            
+            console.log('User string:', userStr);
+            console.log('Token:', token);
+            
+            if (!userStr) {
+                // Create default user for testing
+                currentUser = { id: 1, name: 'Test Seller', email: 'seller@test.com' };
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                localStorage.setItem('token', 'test-token');
+                console.log('Created default user:', currentUser);
+            } else {
+                currentUser = JSON.parse(userStr);
+                console.log('Loaded user:', currentUser);
+            }
+            
+            // Load products
+            loadProducts();
+            
+            // Check for success message
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('itemAdded') === 'true') {
+                showAlert('✅ Item published successfully!', 'success');
+                window.history.replaceState({}, document.title, 'my-items-simple.html');
+            }
+        });
+
+        function loadProducts() {
+            console.log('=== LOADING PRODUCTS ===');
+            console.log('Current user:', currentUser);
+            
+            // Get all products from localStorage
+            const allStoredProducts = JSON.parse(localStorage.getItem('products') || '[]');
+            console.log('All products in storage:', allStoredProducts.length);
+            console.log('Products:', allStoredProducts);
+            
+            // Filter by current user
+            const userProducts = allStoredProducts.filter(p => {
+                const match = p.sellerId == currentUser.id;
+                console.log(`Product "${p.name}": sellerId=${p.sellerId}, userId=${currentUser.id}, match=${match}`);
+                return match;
+            });
+            
+            console.log('User products:', userProducts.length);
+            
+            allProducts = userProducts;
+            updateStats(userProducts);
+            displayProducts(userProducts);
+        }
+
+        function updateStats(products) {
+            const total = products.length;
+            const active = products.filter(p => p.status === 'ACTIVE').length;
+            const value = products.reduce((sum, p) => sum + (p.price * p.stock), 0);
+            const lowStock = products.filter(p => p.stock < 10).length;
+            
+            document.getElementById('totalItems').textContent = total;
+            document.getElementById('activeItems').textContent = active;
+            document.getElementById('totalValue').textContent = '₹' + value.toFixed(2);
+            document.getElementById('lowStock').textContent = lowStock;
+        }
+
+        function displayProducts(products) {
+            console.log('=== DISPLAYING PRODUCTS ===');
+            console.log('Products to display:', products.length);
+            
+            const grid = document.getElementById('productsGrid');
+            
+            if (products.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 60px;">📦</div>
+                        <h3>No Items Yet</h3>
+                        <p>Start by adding your first product!</p>
+                        <a href="add-item.html" class="btn btn-success" style="margin-top: 20px;">➕ Add Your First Item</a>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = products.map(p => `
+                <div class="product-card">
+                    <img src="${p.imageUrl || 'https://via.placeholder.com/300'}" 
+                         class="product-image" 
+                         onerror="this.src='https://via.placeholder.com/300'">
+                    <div class="product-info">
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-price">₹${p.price.toFixed(2)}</div>
+                        <div class="product-details">📁 ${p.category || 'General'}</div>
+                        <div class="product-details">📦 Stock: ${p.stock} items</div>
+                        <div class="product-details">🏷️ ${p.brand || 'N/A'}</div>
+                        <div class="product-details">✨ ${p.condition || 'New'}</div>
+                        <div class="product-actions">
+                            <button class="btn btn-edit" onclick="editProduct(${p.id})">✏️ Edit</button>
+                            <button class="btn btn-delete" onclick="deleteProduct(${p.id})">🗑️ Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            console.log('✅ Products displayed');
+        }
+
+        function editProduct(id) {
+            alert('Edit functionality coming soon! Product ID: ' + id);
+        }
+
+        function deleteProduct(id) {
+            if (!confirm('Delete this product?')) return;
+            
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const updated = products.filter(p => p.id !== id);
+            localStorage.setItem('products', JSON.stringify(updated));
+            
+            showAlert('✅ Product deleted!', 'success');
+            loadProducts();
+        }
+
+        function showDebug() {
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            let msg = `User ID: ${user.id}\n`;
+            msg += `Total products: ${products.length}\n\n`;
+            
+            products.forEach((p, i) => {
+                msg += `${i+1}. ${p.name}\n`;
+                msg += `   Seller ID: ${p.sellerId}\n`;
+                msg += `   Match: ${p.sellerId == user.id ? 'YES' : 'NO'}\n\n`;
+            });
+            
+            console.log(msg);
+            alert('Debug info logged to console (F12)');
+        }
+
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+    </script>
+</body>
+</html>

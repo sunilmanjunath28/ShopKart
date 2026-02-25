@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Products - ShopKart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #667eea;
+        }
+        .btn {
+            padding: 12px 24px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-danger {
+            background: #e94560;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .products-list {
+            margin-top: 20px;
+        }
+        .product-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        .product-item img {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Product Storage Test</h1>
+        <p>This page helps you test the localStorage product system</p>
+        
+        <div>
+            <button class="btn btn-primary" onclick="addTestProduct()">➕ Add Test Product</button>
+            <button class="btn btn-success" onclick="viewProducts()">👁️ View All Products</button>
+            <button class="btn btn-danger" onclick="clearProducts()">🗑️ Clear All Products</button>
+        </div>
+        
+        <div class="products-list" id="productsList"></div>
+        
+        <h3>Console Output:</h3>
+        <pre id="console"></pre>
+    </div>
+
+    <script>
+        let consoleOutput = [];
+        
+        function log(message) {
+            consoleOutput.push(message);
+            document.getElementById('console').textContent = consoleOutput.join('\n');
+            console.log(message);
+        }
+
+        function addTestProduct() {
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            
+            const testProduct = {
+                id: Date.now(),
+                name: `Test Product ${products.length + 1}`,
+                price: Math.floor(Math.random() * 1000) + 100,
+                category: 'Electronics, Gadgets',
+                stock: Math.floor(Math.random() * 50) + 10,
+                description: 'This is a test product created for testing purposes',
+                brand: 'TestBrand',
+                condition: 'New',
+                warranty: '1 Year',
+                imageUrl: 'https://via.placeholder.com/300',
+                sellerId: 1,
+                status: 'ACTIVE',
+                createdAt: new Date().toISOString()
+            };
+            
+            products.push(testProduct);
+            localStorage.setItem('products', JSON.stringify(products));
+            
+            log(`✅ Added test product: ${testProduct.name}`);
+            log(`Total products: ${products.length}`);
+            
+            viewProducts();
+        }
+
+        function viewProducts() {
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const container = document.getElementById('productsList');
+            
+            log(`📦 Total products in storage: ${products.length}`);
+            
+            if (products.length === 0) {
+                container.innerHTML = '<p style="color: #999;">No products found. Add a test product to get started.</p>';
+                return;
+            }
+            
+            container.innerHTML = '<h3>Products in localStorage:</h3>' + products.map((p, index) => `
+                <div class="product-item">
+                    <strong>#${index + 1} - ${p.name}</strong><br>
+                    💰 Price: ₹${p.price}<br>
+                    📁 Category: ${p.category}<br>
+                    📦 Stock: ${p.stock}<br>
+                    🆔 ID: ${p.id}<br>
+                    👤 Seller ID: ${p.sellerId}<br>
+                    📅 Created: ${new Date(p.createdAt).toLocaleString()}
+                </div>
+            `).join('');
+        }
+
+        function clearProducts() {
+            if (confirm('Are you sure you want to clear all products?')) {
+                localStorage.removeItem('products');
+                log('🗑️ All products cleared');
+                viewProducts();
+            }
+        }
+
+        // Auto-load on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            log('🚀 Test page loaded');
+            viewProducts();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Test - ShopKart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #667eea; }
+        .btn {
+            padding: 15px 30px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #e94560; color: white; }
+        .output {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Quick Test Page</h1>
+        <p>Use this page to test the product system</p>
+        
+        <div>
+            <button class="btn btn-success" onclick="addTestProduct()">➕ Add Test Product</button>
+            <button class="btn btn-primary" onclick="viewProducts()">👁️ View Products</button>
+            <button class="btn btn-primary" onclick="checkUser()">👤 Check User</button>
+            <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear All</button>
+        </div>
+        
+        <div class="output" id="output">Click a button to start...</div>
+        
+        <div style="margin-top: 20px;">
+            <a href="my-items.html" class="btn btn-primary">Go to My Items Page</a>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            document.getElementById('output').textContent = message;
+            console.log(message);
+        }
+
+        function addTestProduct() {
+            // Get or create user
+            let user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!user.id) {
+                user = { id: 1, name: 'Test Seller', email: 'seller@test.com' };
+                localStorage.setItem('user', JSON.stringify(user));
+                log('Created test user: ' + JSON.stringify(user, null, 2));
+            }
+            
+            // Get existing products
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            
+            // Create test product
+            const testProduct = {
+                id: Date.now(),
+                name: `Test Product ${products.length + 1}`,
+                price: Math.floor(Math.random() * 1000) + 100,
+                category: 'Electronics, Gadgets',
+                stock: Math.floor(Math.random() * 50) + 10,
+                description: 'This is a test product for debugging',
+                brand: 'TestBrand',
+                condition: 'New',
+                warranty: '1 Year',
+                imageUrl: 'https://via.placeholder.com/300',
+                images: ['https://via.placeholder.com/300'],
+                sellerId: user.id,
+                status: 'ACTIVE',
+                createdAt: new Date().toISOString()
+            };
+            
+            // Add to products array
+            products.push(testProduct);
+            localStorage.setItem('products', JSON.stringify(products));
+            
+            log(`✅ Test product added successfully!
+
+Product Details:
+- ID: ${testProduct.id}
+- Name: ${testProduct.name}
+- Seller ID: ${testProduct.sellerId}
+- Price: ₹${testProduct.price}
+- Stock: ${testProduct.stock}
+
+Total products in storage: ${products.length}
+
+Now go to My Items page to see it!`);
+        }
+
+        function viewProducts() {
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (products.length === 0) {
+                log('No products found in localStorage');
+                return;
+            }
+            
+            let output = `Total products in storage: ${products.length}\n`;
+            output += `Current user ID: ${user.id}\n\n`;
+            
+            products.forEach((p, index) => {
+                const match = p.sellerId == user.id;
+                output += `Product #${index + 1}:\n`;
+                output += `- Name: ${p.name}\n`;
+                output += `- ID: ${p.id}\n`;
+                output += `- Seller ID: ${p.sellerId} (type: ${typeof p.sellerId})\n`;
+                output += `- Match with user: ${match ? 'YES ✅' : 'NO ❌'}\n`;
+                output += `- Price: ₹${p.price}\n`;
+                output += `- Stock: ${p.stock}\n\n`;
+            });
+            
+            const userProducts = products.filter(p => p.sellerId == user.id);
+            output += `\nProducts for current user: ${userProducts.length}`;
+            
+            log(output);
+        }
+
+        function checkUser() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = localStorage.getItem('token');
+            
+            if (!user.id) {
+                log('❌ No user found!\n\nCreating test user...');
+                const testUser = { id: 1, name: 'Test Seller', email: 'seller@test.com' };
+                localStorage.setItem('user', JSON.stringify(testUser));
+                localStorage.setItem('token', 'test-token');
+                log('✅ Test user created:\n\n' + JSON.stringify(testUser, null, 2));
+            } else {
+                log(`✅ User found:\n\nID: ${user.id} (type: ${typeof user.id})\nName: ${user.name}\nEmail: ${user.email}\nToken: ${token ? 'Present' : 'Missing'}`);
+            }
+        }
+
+        function clearAll() {
+            if (confirm('Clear all products and user data?')) {
+                localStorage.removeItem('products');
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                log('✅ All data cleared!');
+            }
+        }
+
+        // Auto-check on load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkUser();
+        });
+    </script>
+</body>
+</html>
